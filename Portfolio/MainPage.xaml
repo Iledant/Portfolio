@@ -1,0 +1,32 @@
+﻿<Page
+    x:Class="Portfolio.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="using:System"
+    xmlns:local="using:Portfolio"
+    xmlns:local1="using:YahooFinanceApi"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Loaded="Page_Loaded"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <NavigationView 
+        x:Name="NavView" 
+        IsSettingsVisible="True" 
+        ItemInvoked="NavView_ItemInvoked" 
+        Tag="NavView"
+        IsBackEnabled="True"
+        BackRequested="NavView_BackRequested">
+        <NavigationView.MenuItems>
+            <NavigationViewItem Tag="companies" Content="Compagnies" Icon="Home" />
+            <NavigationViewItem Tag="funds" Content="Fonds" Icon="Page2" />
+            <NavigationViewItem Tag="portfolios" Content="Portefeuilles" Icon="Folder" />
+            <NavigationViewItem Tag="import" Content="Import" Icon="Import" />
+            <NavigationViewItem Tag="logs" Content="Log" Icon="List" />
+        </NavigationView.MenuItems>
+        <ScrollViewer>
+            <Frame x:Name="ContentFrame" IsTabStop="True"/>
+        </ScrollViewer>
+    </NavigationView>
+</Page>

@@ -1,0 +1,29 @@
+﻿<Page
+    x:Class="Portfolio.Pages.LogPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Portfolio.Pages"
+    xmlns:local1="using:Portfolio"
+    xmlns:sys="using:System"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel Padding="12" Spacing="6">
+        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,20">
+            <Rectangle Width="6" Fill="LightGray"/>
+            <TextBlock Text="Liste des événements" Style="{ThemeResource SubtitleTextBlockStyle}" />
+        </StackPanel>
+        <ListView ItemsSource="{x:Bind ViewModel.LogLines, Mode=OneWay}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local1:LogLine">
+                    <StackPanel Spacing="6" Orientation="Horizontal">
+                        <TextBlock Text="{x:Bind sys:String.Format('{0:dd/MM/yy HH:mm:ss} :', Date)}" />
+                        <TextBlock Text="{x:Bind Message}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackPanel>
+</Page>

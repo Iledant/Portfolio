@@ -1,0 +1,99 @@
+﻿<Page
+    x:Class="Portfolio.Pages.PortFolioPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="using:System"
+    xmlns:local="using:Portfolio.Pages"
+    xmlns:local1="using:Portfolio.Models"
+    xmlns:local2="using:Portfolio.ViewModel"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Loaded="Page_Loaded"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <XamlUICommand
+            x:Name="UIRemoveCommand"
+            ExecuteRequested="RemoveCommand_ExecuteRequested"
+            Description="Retirer le fond du portefeuille"
+            Label="Retirer">
+            <XamlUICommand.IconSource>
+                <SymbolIconSource Symbol="Remove"/>
+            </XamlUICommand.IconSource>
+        </XamlUICommand>
+        <XamlUICommand
+            x:Name="UIModifyCommand"
+            ExecuteRequested="ModifyCommand_ExecuteRequested"
+            Description="Modifier le fond"
+            Label="Modifier">
+            <XamlUICommand.IconSource>
+                <SymbolIconSource Symbol="Edit"/>
+            </XamlUICommand.IconSource>
+        </XamlUICommand>
+        <XamlUICommand
+            x:Name="UIAddCommand"
+            ExecuteRequested="AddCommand_ExecuteRequested"
+            Description="Ajouter un fond"
+            Label="Ajouter">
+            <XamlUICommand.IconSource>
+                <SymbolIconSource Symbol="Add"/>
+            </XamlUICommand.IconSource>
+        </XamlUICommand>
+    </Page.Resources>
+
+    <StackPanel Orientation="Vertical" Padding="12" Spacing="6">
+        <StackPanel Orientation="Horizontal" Spacing="12"  Margin="0,0,0,24">
+            <Rectangle Fill="CadetBlue" Width="6"/>
+            <TextBlock x:Name="Title" Text="Portefeuille" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </StackPanel>
+        <Grid ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" x:Name="AddButton" Click="AddButton_Click">Ajouter</Button>
+            <local:DebounceSearch Grid.Column="1" x:Name="Search" TextChanged="Search_TextChanged" />
+        </Grid>
+        <GridView 
+            x:Name="ListView"
+            ItemsSource="{x:Bind ViewModel.Lines, Mode=OneWay}"
+            Margin="0,20,0,0">
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local1:PortFolioLine">
+                    <UserControl>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Rectangle Fill="YellowGreen" Grid.Column="0" Width="6"/>
+                            <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="6" Padding="12">
+                                <TextBlock Text="{x:Bind sys:String.Format('Fond : {0}', FundName)}" />
+                                <TextBlock Text="{x:Bind sys:String.Format('Compagnie : {0}', CompanyName)}" />
+                                <TextBlock Text="{x:Bind sys:String.Format('Quantité : {0:g}', Quantity)}" />
+                                <TextBlock Text="{x:Bind local2:Bindable.NullDateTimeDisplay('Date d^&apos;achat : ', Date)}" />
+                                <TextBlock Text="{x:Bind local2:Bindable.NullDoubleDisplay('Prix moyen d^&apos;achat : ',AverageVal )}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <UserControl.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem 
+                                    Command="{StaticResource UIRemoveCommand}" 
+                                    CommandParameter="{x:Bind }"/>
+                                <MenuFlyoutItem 
+                                    Command="{StaticResource UIModifyCommand}" 
+                                    CommandParameter="{x:Bind }"/>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem 
+                                    Command="{StaticResource UIAddCommand}" 
+                                    CommandParameter="{x:Bind }"/>
+                            </MenuFlyout>
+                        </UserControl.ContextFlyout>
+                    </UserControl>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+    </StackPanel>
+</Page>

@@ -1,0 +1,20 @@
+﻿<Page
+    x:Class="Portfolio.Pages.FundChartPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Portfolio.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="using:Portfolio.Controls"
+    mc:Ignorable="d"
+    Loaded="Page_Loaded"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel Padding="12" Spacing="6">
+        <StackPanel Orientation="Horizontal" Spacing="12"  Margin="0,0,0,24">
+            <Rectangle Fill="YellowGreen" Width="6"/>
+            <TextBlock x:Name="Title" Text="Fond " Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </StackPanel>
+        <controls:CandelierChart x:Name="Chart" Height="600" Stroke="YellowGreen" InnerMargin="5"/>
+    </StackPanel>
+</Page>
