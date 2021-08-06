@@ -55,6 +55,19 @@ namespace Portfolio.Controls
                 typeof(CandelierChart),
                 new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 3, 3, 3))));
 
+        public Brush LegendBackground
+        {
+            get { return (Brush)GetValue(LegendBackgroundProperty); }
+            set { SetValue(LegendBackgroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty LegendBackgroundProperty =
+            DependencyProperty.Register(
+                nameof(LegendBackground),
+                typeof(Brush),
+                typeof(CandelierChart),
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 16, 16, 16))));
+
         public List<FundData> Values
         {
             get => (List<FundData>)GetValue(ValuesProperty);
@@ -460,14 +473,25 @@ namespace Portfolio.Controls
                     PointerLineLegend.Visibility = Visibility.Visible;
                     double ticks = (point.Position.X - VerticalAxis.X1) / _horizontalScale + _firstTicks;
                     FundData fundData = FindClosest(ticks);
-                    PointerLineLegend.Text = string.Format("{0:dd/MM/yy}\n{1:F2} €", fundData.Date, fundData.Val);
-                    Canvas.SetTop(PointerLineLegend, (double)point.Position.Y);
-                    Canvas.SetLeft(PointerLineLegend, (double)point.Position.X);
+                    LegendText.Text = string.Format("{0:dd/MM/yy}\n{1:F2} €", fundData.Date, fundData.Val);
+                    PointerLineLegend.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                    double x = HorizontalAxis.X2 - point.Position.X < PointerLineLegend.ActualWidth ? point.Position.X - PointerLineLegend.ActualWidth - 5 : point.Position.X + 5;
+                    double y = (_verticalAxisMaxVal - fundData.Val) * _verticalScale + ChartPadding;
+                    ValueRectangle.Visibility = Visibility.Visible;
+                    Canvas.SetTop(ValueRectangle, y - 6);
+                    Canvas.SetLeft(ValueRectangle, (fundData.Date.Ticks - _firstTicks) * _horizontalScale + VerticalAxis.X1 - 6);
+                    if (y + PointerLineLegend.ActualHeight > HorizontalAxis.Y1)
+                    {
+                        y -= PointerLineLegend.ActualHeight + 5;
+                    }
+                    Canvas.SetTop(PointerLineLegend, y);
+                    Canvas.SetLeft(PointerLineLegend, x);
                 }
                 else
                 {
                     PointerLine.Visibility = Visibility.Collapsed;
                     PointerLineLegend.Visibility = Visibility.Collapsed;
+                    ValueRectangle.Visibility = Visibility.Collapsed;
                 }
             }
 
@@ -492,10 +516,8 @@ namespace Portfolio.Controls
                     i = k;
             }
 
-            if (Math.Abs(Values[i].Date.Ticks - ticks) <= Math.Abs(Values[j].Date.Ticks - ticks))
-                return Values[i];
-            else
-                return Values[j];
+            return (Math.Abs(Values[i].Date.Ticks - ticks) <= Math.Abs(Values[j].Date.Ticks - ticks)) ?
+                Values[i] : Values[j];
         }
     }
 }

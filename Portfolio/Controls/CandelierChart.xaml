@@ -15,6 +15,20 @@
         <Line x:Name="VerticalAxis" Stroke="{x:Bind AxisStroke, Mode=OneWay}"/>
         <Line x:Name="HorizontalAxis" Stroke="{x:Bind AxisStroke, Mode=OneWay}"/>
         <Line x:Name="PointerLine" Stroke="{x:Bind AxisStroke, Mode=OneWay}" Visibility="Collapsed" />
-        <TextBlock x:Name="PointerLineLegend" Visibility="Collapsed" />
+        <Border 
+            x:Name="PointerLineLegend" 
+            Background="{x:Bind LegendBackground, Mode=OneWay}" 
+            BorderThickness="1"
+            BorderBrush="Gray"
+            Visibility="Collapsed">
+            <TextBlock x:Name="LegendText" Margin="6,0,6,0" TextAlignment="Center" />
+        </Border>
+        <Rectangle 
+            Width="13" 
+            Height="13" 
+            x:Name="ValueRectangle" 
+            Stroke="{x:Bind AxisStroke, Mode=OneWay}" 
+            Visibility="Collapsed"
+            StrokeThickness="1" />
     </Canvas>
 </UserControl>
