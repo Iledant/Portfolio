@@ -9,10 +9,12 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Canvas x:Name="Box" SizeChanged="Box_SizeChanged">
+    <Canvas x:Name="Box" SizeChanged="Box_SizeChanged" PointerMoved="Box_PointerMoved">
         <Polygon x:Name="BackgroundRectangle" Fill="{x:Bind ChartBackground, Mode=OneWay}"/>
         <Polyline x:Name="ValueLine" Stroke="{x:Bind Stroke, Mode=OneWay}"  StrokeThickness="{x:Bind StrokeThickness, Mode=OneWay}"/>
         <Line x:Name="VerticalAxis" Stroke="{x:Bind AxisStroke, Mode=OneWay}"/>
         <Line x:Name="HorizontalAxis" Stroke="{x:Bind AxisStroke, Mode=OneWay}"/>
+        <Line x:Name="PointerLine" Stroke="{x:Bind AxisStroke, Mode=OneWay}" Visibility="Collapsed" />
+        <TextBlock x:Name="PointerLineLegend" Visibility="Collapsed" />
     </Canvas>
 </UserControl>

@@ -1,10 +1,13 @@
 ﻿using Portfolio.Models;
 using System;
 using System.Collections.Generic;
+using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.UI;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
 
@@ -194,12 +197,12 @@ namespace Portfolio.Controls
             CalculateVerticalTicks();
             CalculateHorizontalScale();
             DrawBackground();
-            DrawPolyline();
             DrawAxes();
             DrawVerticalTicks();
             DrawVerticalLabels();
             DrawHorizontalTicks();
             DrawHorizontalLabels();
+            DrawPolyline();
         }
 
         private void GetMinMaxVal()
@@ -326,7 +329,7 @@ namespace Portfolio.Controls
             foreach (FundData data in Values)
             {
                 points.Add(new Point(
-                    (int)((data.Date.Ticks - _firstTicks) * _horizontalScale + ChartPadding + 2 * InnerMargin + _verticalAxisTextWidth),
+                    (int)((data.Date.Ticks - _firstTicks) * _horizontalScale + VerticalAxis.X1),
                     (int)((_verticalAxisMaxVal - data.Val) * _verticalScale + ChartPadding)));
             }
 
@@ -437,5 +440,62 @@ namespace Portfolio.Controls
         }
 
         #endregion
+
+        private void Box_PointerMoved(object _, PointerRoutedEventArgs e)
+        {
+            Pointer ptr = e.Pointer;
+
+            if (ptr.PointerDeviceType == PointerDeviceType.Mouse)
+            {
+                PointerPoint point = e.GetCurrentPoint(Box);
+
+                if (point.Position.X > VerticalAxis.X1 && point.Position.Y < HorizontalAxis.Y1)
+                {
+                    PointerLine.Visibility = Visibility.Visible;
+                    PointerLine.X1 = point.Position.X;
+                    PointerLine.X2 = point.Position.X;
+                    PointerLine.Y1 = VerticalAxis.Y1;
+                    PointerLine.Y2 = VerticalAxis.Y2 - 1;
+
+                    PointerLineLegend.Visibility = Visibility.Visible;
+                    double ticks = (point.Position.X - VerticalAxis.X1) / _horizontalScale + _firstTicks;
+                    FundData fundData = FindClosest(ticks);
+                    PointerLineLegend.Text = string.Format("{0:dd/MM/yy}\n{1:F2} €", fundData.Date, fundData.Val);
+                    Canvas.SetTop(PointerLineLegend, (double)point.Position.Y);
+                    Canvas.SetLeft(PointerLineLegend, (double)point.Position.X);
+                }
+                else
+                {
+                    PointerLine.Visibility = Visibility.Collapsed;
+                    PointerLineLegend.Visibility = Visibility.Collapsed;
+                }
+            }
+
+            e.Handled = true;
+        }
+
+        private FundData FindClosest(double ticks)
+        {
+            int i = 0, j = Values.Count - 1, k;
+            double daySpan = TimeSpan.FromDays(1).Ticks;
+
+            while (j - i > 2 && Math.Abs(Values[i].Date.Ticks - ticks) > daySpan)
+            {
+                k = (i + j) / 2;
+                if (Math.Abs(Values[k].Date.Ticks - ticks) < daySpan)
+                {
+                    return Values[k];
+                }
+                if (Values[k].Date.Ticks > ticks)
+                    j = k;
+                else
+                    i = k;
+            }
+
+            if (Math.Abs(Values[i].Date.Ticks - ticks) <= Math.Abs(Values[j].Date.Ticks - ticks))
+                return Values[i];
+            else
+                return Values[j];
+        }
     }
 }
