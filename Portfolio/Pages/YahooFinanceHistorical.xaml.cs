@@ -14,12 +14,12 @@ namespace Portfolio.Pages
     /// </summary>
     public sealed partial class YahooFinanceHistorical : Page
     {
-        private readonly HistoricalViewModel ViewModel;
+        private readonly YahooFinanceViewModel ViewModel;
 
         public YahooFinanceHistorical()
         {
             InitializeComponent();
-            ViewModel = new HistoricalViewModel();
+            ViewModel = new YahooFinanceViewModel();
             ViewModel.GetFunds();
         }
 
@@ -65,6 +65,11 @@ namespace Portfolio.Pages
                     FundRepository.AddHistorical(selectedFund, ViewModel.History);
                 }
             }
+        }
+
+        private void QuoteSearchButton_Click(object _1, RoutedEventArgs _2)
+        {
+            ViewModel.PickStocks(QuoteTextBox.Text);
         }
     }
 }

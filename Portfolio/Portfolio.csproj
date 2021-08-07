@@ -186,7 +186,7 @@
     <Compile Include="ViewModel\DBViewModel.cs" />
     <Compile Include="ViewModel\FundsViewModel.cs" />
     <Compile Include="ViewModel\FundViewModel.cs" />
-    <Compile Include="ViewModel\HistoricalViewModel.cs" />
+    <Compile Include="ViewModel\YahooFinanceViewModel.cs" />
     <Compile Include="ViewModel\LogPageViewModel.cs" />
     <Compile Include="ViewModel\PortFolioLineViewModel.cs" />
     <Compile Include="ViewModel\PortFoliosViewModel.cs" />
@@ -276,6 +276,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.12</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="Npgsql">
       <Version>4.1.9</Version>
