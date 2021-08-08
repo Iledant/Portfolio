@@ -21,6 +21,7 @@ namespace Portfolio
             ("import", "Import", typeof(YahooFinanceHistorical)),
             ("companies", "Compagnies", typeof(CompaniesPage)),
             ("funds", "Fonds", typeof(FundsPage)),
+            ("fundSearch", "Recherche de fonds", typeof(FindFundPage)),
             ("portfolios", "Portefeuilles", typeof(PortfoliosPage)),
             ("logs", "Log", typeof(LogPage)),
         };
