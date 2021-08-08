@@ -2,6 +2,7 @@
 
 using Npgsql;
 using Portfolio.Models;
+using Portfolio.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,9 +132,9 @@ namespace Portfolio.Repositories
             string insertQuery = "INSERT INTO fund_data_import (date,val) " +
                 "SELECT * FROM unnest(@d,@v) AS d";
             using NpgsqlCommand? importCmd = new(insertQuery, con);
-            importCmd.Parameters.Add(new NpgsqlParameter<DateTime[]>("d", 
+            importCmd.Parameters.Add(new NpgsqlParameter<DateTime[]>("d",
                 historical.Select(e => e.DateTime).ToArray()));
-            importCmd.Parameters.Add(new NpgsqlParameter<double[]>("v", 
+            importCmd.Parameters.Add(new NpgsqlParameter<double[]>("v",
                 historical.Select(e => (double)e.Close).ToArray()));
             importCmd.ExecuteNonQuery();
 
@@ -163,6 +164,29 @@ namespace Portfolio.Repositories
                     val: reader.GetDouble(2)));
             }
             return datas;
+        }
+
+        public static DBState AddQuote(Quote quote, int companyID)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            string query = "INSERT INTO fund (name,comment,isin,yahoo_code,company_id) VALUES(@name,null,null,@yahoo_code,@company_id);";
+            using NpgsqlCommand? cmd = new(query, con);
+            _ = cmd.Parameters.AddWithValue("name", quote.Longname== "" ? quote.Shortname : quote.Longname);
+            _ = cmd.Parameters.AddWithValue("yahoo_code",
+                Repository.ConvertNullableStringParam(quote.Symbol));
+            _ = cmd.Parameters.AddWithValue("company_id", companyID);
+            try
+            {
+                _ = cmd.ExecuteNonQuery();
+            }
+            catch (PostgresException exception)
+            {
+                if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
+                {
+                    return DBState.AlreadyExists;
+                }
+            }
+            return DBState.OK;
         }
     }
 }
