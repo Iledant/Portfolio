@@ -61,8 +61,6 @@ namespace Portfolio.Pages
             }
 
             ViewModel.FetchFundDatas(_fund.ID);
-            Chart.HorizontalAxis.LabelInterval = ViewModel.FundDatas.Count > 0 ? ViewModel.FundDatas.Count / 20 : 1;
-            Chart.Visibility = ViewModel.FundDatas.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void NameBox_TextChanged(object _1, TextChangedEventArgs _2)

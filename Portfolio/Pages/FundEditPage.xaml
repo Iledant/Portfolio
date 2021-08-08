@@ -43,22 +43,5 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Text="Historique des valeurs" x:Name="GraphTitle" Margin="0,14,0,0"/>
-        <telerik:RadCartesianChart x:Name="Chart" Visibility="Collapsed" Height="500">
-            <telerik:RadCartesianChart.HorizontalAxis>
-                <telerik:DateTimeContinuousAxis LabelFormat="{}{0,0:dd/mm/yy}"/>
-            </telerik:RadCartesianChart.HorizontalAxis>
-            <telerik:RadCartesianChart.VerticalAxis>
-                <telerik:LinearAxis/>
-            </telerik:RadCartesianChart.VerticalAxis>
-            <telerik:LineSeries ItemsSource="{x:Bind ViewModel.FundDatas}">
-                <telerik:LineSeries.ValueBinding>
-                    <telerik:PropertyNameDataPointBinding PropertyName="Val" />
-                </telerik:LineSeries.ValueBinding>
-                <telerik:LineSeries.CategoryBinding>
-                    <telerik:PropertyNameDataPointBinding PropertyName="Date" />
-                </telerik:LineSeries.CategoryBinding>
-            </telerik:LineSeries>
-        </telerik:RadCartesianChart>
     </StackPanel>
 </Page>
