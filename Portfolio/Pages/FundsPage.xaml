@@ -5,6 +5,7 @@
     xmlns:sys="using:System"
     xmlns:local="using:Portfolio.Pages"
     xmlns:local1="using:Portfolio.Models"
+    xmlns:local2="using:Portfolio.ViewModel"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -70,9 +71,10 @@
                             </Grid.ColumnDefinitions>
                             <Rectangle Grid.Column="0" Width="6" Fill="GreenYellow" />
                             <StackPanel Orientation="Vertical" Spacing="6" Padding="12" Grid.Column="1">
-                                <TextBlock Text="{x:Bind sys:String.Format('Nom : {0}', Name)}" />
-                                <TextBlock Text="{x:Bind sys:String.Format('Compagnie : {0}', CompanyName)}" />
-                                <TextBlock Text="{x:Bind sys:String.Format('ISIN : {0}', ISIN)}" />
+                                <TextBlock Text="{x:Bind local2:Converters.LabelNullableString('Nom', Name)}" />
+                                <TextBlock Text="{x:Bind local2:Converters.LabelNullableString('Compagnie', CompanyName)}" />
+                                <TextBlock Text="{x:Bind local2:Converters.LabelNullableString('ISIN', ISIN)}" />
+                                <TextBlock Text="{x:Bind local2:Converters.LabelNullableString('Code Yahoo', YahooCode)}" />
                             </StackPanel>
                         </Grid>
                         <UserControl.ContextFlyout>
