@@ -50,6 +50,7 @@ namespace Portfolio.ViewModel
         private List<Fund> _funds;
         private static readonly HttpClient client = new();
         private List<Quote> _quotes;
+        private List<Company> _companies;
 
         public IReadOnlyList<Candle> History
         {
@@ -91,12 +92,18 @@ namespace Portfolio.ViewModel
             }
         }
 
+        public List<Company> Companies
+        {
+            get => _companies;
+            set
+            {
+                _companies = value;
+                OnPropertyChanged(nameof(Companies));
+            }
+        }
+
         public async void GetHistorical(string pattern, DateTime startTime, DateTime? endTime = null)
         {
-            if (endTime is null)
-            {
-                endTime = DateTime.Now;
-            }
             Yahoo.IgnoreEmptyRows = true;
             try
             {
@@ -135,6 +142,11 @@ namespace Portfolio.ViewModel
         public void GetFunds()
         {
             Funds = FundRepository.Get("");
+        }
+
+        public void GetCompanies()
+        {
+            Companies = CompanyRepository.Get("");
         }
     }
 }
