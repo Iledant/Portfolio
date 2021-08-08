@@ -22,8 +22,14 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="QuoteTextBox" Grid.Column="0" Header="Valeur recherchée" />
-            <Button Grid.Column="1" x:Name="QuoteSearchButton" Click="QuoteSearchButton_Click" VerticalAlignment="Bottom">Chercher</Button>
+            <TextBox x:Name="QuoteTextBox" Grid.Column="0" Header="Nom du fond" TextChanged="QuoteTextBox_TextChanged" />
+            <Button 
+                Grid.Column="1" 
+                x:Name="QuoteSearchButton" 
+                Click="QuoteSearchButton_Click"
+                VerticalAlignment="Bottom">
+                Chercher
+            </Button>
         </Grid>
         <GridView 
             x:Name="QuotesList"
@@ -74,6 +80,17 @@
                 <SymbolIcon Symbol="ReportHacked" VerticalAlignment="Center" Foreground="Red"/>
                 <TextBlock 
                 Text="Un fond avec ce code est déjà présent dans la base" Foreground="Red" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel 
+                x:Name="OkStackPanel" 
+                Visibility="Collapsed" 
+                Background="#010" 
+                Orientation="Horizontal" 
+                Padding="12,0,12,0" 
+                Spacing="6">
+                <SymbolIcon Symbol="Accept" VerticalAlignment="Center" Foreground="Green"/>
+                <TextBlock 
+                Text="Le fond a été ajouté à la base, récupération de l'historique" Foreground="Green" VerticalAlignment="Center"/>
             </StackPanel>
         </StackPanel>
     </StackPanel>

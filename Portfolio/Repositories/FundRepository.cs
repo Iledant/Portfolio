@@ -146,9 +146,13 @@ namespace Portfolio.Repositories
         public static void Delete(Fund fund)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = $"DELETE FROM fund WHERE id={fund.ID};";
-            using NpgsqlCommand? cmd = new(query, con);
-            _ = cmd.ExecuteNonQuery();
+            string deleteDataQuery = $"DELETE FROM fund_data WHERE fund_id={fund.ID}";
+            using NpgsqlCommand? deleteDatacmd = new(deleteDataQuery, con);
+            _ = deleteDatacmd.ExecuteNonQuery();
+
+            string deleteFundQuery = $"DELETE FROM fund WHERE id={fund.ID};";
+            using NpgsqlCommand? deleteFundcmd = new(deleteFundQuery, con);
+            _ = deleteFundcmd.ExecuteNonQuery();
         }
 
         public static async Task UpdateHistorical(Fund fund)
@@ -197,28 +201,35 @@ namespace Portfolio.Repositories
             return datas;
         }
 
-        public static DBState AddQuote(Quote quote, int companyID)
+        public static (Fund,DBState) AddQuote(Quote quote, int companyID)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "INSERT INTO fund (name,comment,isin,yahoo_code,company_id) VALUES(@name,null,null,@yahoo_code,@company_id);";
+            int id;
+            string query = "INSERT INTO fund (name,comment,isin,yahoo_code,company_id) " +
+                "VALUES(@name,null,null,@yahoo_code,@company_id) " +
+                "RETURNING id;";
+            string name = quote.Longname == "" ? quote.Shortname : quote.Longname;
             using NpgsqlCommand? cmd = new(query, con);
-            _ = cmd.Parameters.AddWithValue("name", quote.Longname == "" ? quote.Shortname : quote.Longname);
+            _ = cmd.Parameters.AddWithValue("name", name);
             _ = cmd.Parameters.AddWithValue("yahoo_code",
                 Repository.ConvertNullableStringParam(quote.Symbol));
             _ = cmd.Parameters.AddWithValue("company_id", companyID);
             try
             {
-                _ = cmd.ExecuteNonQuery();
+                using NpgsqlDataReader? reader = cmd.ExecuteReader();
+                reader.Read();
+                id = reader.GetInt32(0);
+                Fund fund = new(id, name, companyID, yahooCode: quote.Symbol);
+                return (fund, DBState.OK);
             }
             catch (PostgresException exception)
             {
                 if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    return DBState.AlreadyExists;
+                    return (null,DBState.AlreadyExists);
                 }
             }
-            return DBState.OK;
+            return (null, DBState.OK);
         }
     }
 }
-
