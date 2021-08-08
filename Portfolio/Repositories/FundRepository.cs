@@ -201,7 +201,7 @@ namespace Portfolio.Repositories
             return datas;
         }
 
-        public static (Fund,DBState) AddQuote(Quote quote, int companyID)
+        public static (Fund?, DBState) AddQuote(Quote quote, int companyID)
         {
             NpgsqlConnection? con = DB.GetConnection();
             int id;
@@ -217,19 +217,19 @@ namespace Portfolio.Repositories
             try
             {
                 using NpgsqlDataReader? reader = cmd.ExecuteReader();
-                reader.Read();
+                _ = reader.Read();
                 id = reader.GetInt32(0);
-                Fund fund = new(id, name, companyID, yahooCode: quote.Symbol);
-                return (fund, DBState.OK);
             }
             catch (PostgresException exception)
             {
                 if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    return (null,DBState.AlreadyExists);
+                    return (null, DBState.AlreadyExists);
                 }
+                return (null, DBState.Error);
             }
-            return (null, DBState.OK);
+            Fund fund = new(id, name, companyID, yahooCode: quote.Symbol);
+            return (fund, DBState.OK);
         }
     }
 }

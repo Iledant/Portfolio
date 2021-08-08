@@ -26,7 +26,8 @@ namespace Portfolio.Repositories
     {
         OK,
         AlreadyExists,
-        NotFound
+        NotFound,
+        Error
     }
 
     public static class DB
