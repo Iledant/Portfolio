@@ -66,10 +66,5 @@ namespace Portfolio.Pages
                 }
             }
         }
-
-        private void QuoteSearchButton_Click(object _1, RoutedEventArgs _2)
-        {
-            ViewModel.PickStocks(QuoteTextBox.Text);
-        }
     }
 }

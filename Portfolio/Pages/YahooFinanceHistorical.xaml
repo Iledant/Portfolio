@@ -43,34 +43,5 @@
             Visibility="Collapsed" 
             Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
             Foreground="Red"/>
-        <Grid ColumnSpacing="6">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBox x:Name="QuoteTextBox" Grid.Column="0" Header="Valeur recherchée" />
-            <Button Grid.Column="1" x:Name="QuoteSearchButton" Click="QuoteSearchButton_Click" VerticalAlignment="Bottom">Chercher</Button>
-        </Grid>
-        <GridView 
-            x:Name="QuotesList"
-            ItemsSource="{x:Bind ViewModel.Quotes, Mode=OneWay}"  
-            Margin="0,20,0,0">
-            <GridView.ItemTemplate>
-                <DataTemplate x:DataType="local3:Quote">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Rectangle Grid.Column="0" Width="6" Fill="GreenYellow" />
-                        <StackPanel Orientation="Vertical" Spacing="6" Padding="12" Grid.Column="1">
-                            <TextBlock Text="{x:Bind sys:String.Format('Symbol : {0}', symbol)}" />
-                            <TextBlock Text="{x:Bind sys:String.Format('Nom court : {0}', Shortname)}" />
-                            <TextBlock Text="{x:Bind sys:String.Format('Nom complet : {0}', longname)}" />
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
     </StackPanel>
 </Page>
