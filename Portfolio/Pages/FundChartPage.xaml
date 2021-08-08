@@ -7,7 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="using:Portfolio.Controls"
     mc:Ignorable="d"
-    Loaded="Page_Loaded"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <StackPanel Padding="12" Spacing="6">
@@ -15,6 +14,29 @@
             <Rectangle Fill="YellowGreen" Width="6"/>
             <TextBlock x:Name="Title" Text="Fond " Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </StackPanel>
-        <controls:CandelierChart x:Name="Chart" Height="600" Stroke="YellowGreen" InnerMargin="5"/>
+        <Grid Margin="6,0,0,0" Background="#111" Padding="6" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Nom" />
+            <TextBlock Grid.Column="1" Grid.Row="0" Text="{x:Bind _fund.Name}" />
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="Code ISIN" />
+            <TextBlock Grid.Column="1" Grid.Row="1" x:Name="ISINTextBlock" />
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="Code Yahoo" />
+            <TextBlock Grid.Column="1" Grid.Row="2" x:Name="YahooCodeTextBlock" />
+            <TextBlock Grid.Column="0" Grid.Row="3" Text="Compagnie" />
+            <TextBlock Grid.Column="1" Grid.Row="3" Text="{x:Bind _fund.CompanyName}" />
+            <TextBlock Grid.Column="0" Grid.Row="4" Text="Commentaire" />
+            <TextBlock Grid.Column="1" Grid.Row="4" x:Name="CommentTextBlock" />
+        </Grid>
+        <controls:CandelierChart x:Name="Chart" Stroke="YellowGreen" Height="500" Margin="0,14,0,0"/>
     </StackPanel>
 </Page>

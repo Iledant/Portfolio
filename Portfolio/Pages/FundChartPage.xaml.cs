@@ -23,18 +23,14 @@ namespace Portfolio.Pages
             if (e.Parameter is Fund)
             {
                 _fund = e.Parameter as Fund;
-
+                ISINTextBlock.Text = _fund.ISIN ?? "-";
+                YahooCodeTextBlock.Text = _fund.YahooCode?? "-";
+                CommentTextBlock.Text = _fund.Comment ?? "-";
+                Chart.Values = FundRepository.GetFundDatas(_fund.ID);
+                Title.Text += $"« {_fund.Name} »";
             }
             base.OnNavigatedTo(e);
 
-        }
-
-        private void Page_Loaded(object _1, Windows.UI.Xaml.RoutedEventArgs _2)
-        {
-            if (_fund != null)
-            {
-                Chart.Values = FundRepository.GetFundDatas(_fund.ID);
-            }
         }
     }
 }
