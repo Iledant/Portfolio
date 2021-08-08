@@ -19,7 +19,7 @@ namespace Portfolio
 
         public override string ToString()
         {
-            return $"{Date:dd/MM/yyy HH:mm:ss}: {Message}";
+            return $"{Date:dd/MM/yyy HH:mm:ss.fff}: {Message}";
         }
     }
 

@@ -19,7 +19,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local1:LogLine">
                     <StackPanel Spacing="6" Orientation="Horizontal">
-                        <TextBlock Text="{x:Bind sys:String.Format('{0:dd/MM/yy HH:mm:ss} :', Date)}" />
+                        <TextBlock Text="{x:Bind sys:String.Format('{0:dd/MM/yy HH:mm:ss.fff} :', Date)}" />
                         <TextBlock Text="{x:Bind Message}" />
                     </StackPanel>
                 </DataTemplate>
