@@ -8,6 +8,7 @@ using System.Linq;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using YahooFinanceApi;
 
 namespace Portfolio
 {
@@ -18,7 +19,6 @@ namespace Portfolio
     {
         private readonly List<(string Tag, string Title, Type Page)> _pages = new()
         {
-            ("import", "Import", typeof(YahooFinanceHistorical)),
             ("companies", "Compagnies", typeof(CompaniesPage)),
             ("funds", "Fonds", typeof(FundsPage)),
             ("fundSearch", "Recherche de fonds", typeof(FindFundPage)),
@@ -81,13 +81,31 @@ namespace Portfolio
             if (DB.Ok)
             {
                 NavView.Header = "Portfolio";
+                UpdateFundDatas();
             }
             else
             {
                 _ = ContentFrame.Navigate(typeof(SettingsPage), ViewModel);
                 NavView.Header = "Connexion impossible à la base de données";
             }
+        }
 
+        private async void UpdateFundDatas()
+        {
+            Yahoo.IgnoreEmptyRows = true;
+            List<Fund> funds = FundRepository.GetNotNullYahooCode();
+            foreach (Fund fund in funds)
+            {
+                try
+                {
+                    await FundRepository.UpdateHistorical(fund);
+                    Log.AddLine($"Mise à jour de l'historique pour le fond \" {fund.Name} \"");
+                }
+                catch (Exception e)
+                {
+                    Log.AddLine($"Erreur de récupération de l'historique de {fund.Name} -> {e.Message}");
+                }
+            }
         }
     }
 }

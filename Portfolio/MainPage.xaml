@@ -23,7 +23,6 @@
             <NavigationViewItem Tag="funds" Content="Fonds" Icon="Page2" />
             <NavigationViewItem Tag="fundSearch" Content="Recherche de fonds" Icon="Zoom" />
             <NavigationViewItem Tag="portfolios" Content="Portefeuilles" Icon="Folder" />
-            <NavigationViewItem Tag="import" Content="Import" Icon="Import" />
             <NavigationViewItem Tag="logs" Content="Log" Icon="List" />
         </NavigationView.MenuItems>
         <ScrollViewer>
