@@ -144,6 +144,9 @@
       <DependentUpon>DebounceSearch.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\DeleteDialog.cs" />
+    <Compile Include="Pages\FindFundPage.xaml.cs">
+      <DependentUpon>FindFundPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\FundChartPage.xaml.cs">
       <DependentUpon>FundChartPage.xaml</DependentUpon>
     </Compile>
@@ -183,6 +186,7 @@
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="ViewModel\Bindable.cs" />
     <Compile Include="ViewModel\CompaniesViewModel.cs" />
+    <Compile Include="ViewModel\Converters.cs" />
     <Compile Include="ViewModel\DBViewModel.cs" />
     <Compile Include="ViewModel\FundsViewModel.cs" />
     <Compile Include="ViewModel\FundViewModel.cs" />
@@ -229,6 +233,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\DebounceSearch.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\FindFundPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -282,9 +290,6 @@
     </PackageReference>
     <PackageReference Include="Npgsql">
       <Version>4.1.9</Version>
-    </PackageReference>
-    <PackageReference Include="Telerik.UI.for.UniversalWindowsPlatform">
-      <Version>1.0.2.5</Version>
     </PackageReference>
     <PackageReference Include="YahooFinanceApi">
       <Version>2.1.2</Version>
