@@ -14,10 +14,10 @@
         <CommandBar ClosedDisplayMode="Compact" OverflowButtonVisibility="Collapsed" DefaultLabelPosition="Right">
             <CommandBar.PrimaryCommands>
                 <AppBarButton Icon="Setting" Click="Settings_Click" ToolTipService.ToolTip="Paramètres"/>
-                <AppBarButton Icon="AllApps">
+                <AppBarButton Icon="AllApps" Click="Log_Click" x:Name="LogAppBarButton">
                     <AppBarButton.Flyout>
-                        <Flyout Opened="Flyout_Opened">
-                            <ListView x:Name="LogFlyoutListView" ItemsSource="{x:Bind ViewModel.LogLines, Mode=OneWay}">
+                        <Flyout>
+                            <ListView x:Name="LogListView">
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem">
                                         <Setter Property="Padding" Value="2" />

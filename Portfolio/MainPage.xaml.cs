@@ -107,9 +107,13 @@ namespace Portfolio
 
         }
 
-        private void Flyout_Opened(object _1, object _2)
+        private void Log_Click(object _1, RoutedEventArgs _2)
         {
-            ViewModel.LogLines = Log.Lines;
+            LogListView.Items.Clear();
+            foreach (LogLine line in Log.Lines)
+            {
+                LogListView.Items.Add(line);
+            }
         }
     }
 }
