@@ -135,7 +135,7 @@ namespace Portfolio.ViewModel
             }
             catch (Exception e)
             {
-                Log.AddLine(e.ToString());
+                Log.AddLine(e.ToString(),LogState.Error);
             }
         }
 

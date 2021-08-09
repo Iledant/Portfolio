@@ -23,7 +23,6 @@ namespace Portfolio
             ("funds", "Fonds", typeof(FundsPage)),
             ("fundSearch", "Recherche de fonds", typeof(FindFundPage)),
             ("portfolios", "Portefeuilles", typeof(PortfoliosPage)),
-            ("logs", "Log", typeof(LogPage)),
         };
 
         private readonly DBViewModel ViewModel;
@@ -42,13 +41,6 @@ namespace Portfolio
 
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            if (args.IsSettingsInvoked)
-            {
-                _ = ContentFrame.Navigate(typeof(SettingsPage), ViewModel, args.RecommendedNavigationTransitionInfo);
-                sender.Header = "Paramètres";
-                return;
-            }
-
             if (args.InvokedItemContainer != null)
             {
                 string navItemTag = args.InvokedItemContainer.Tag.ToString();
@@ -106,6 +98,18 @@ namespace Portfolio
                     Log.AddLine($"Erreur de récupération de l'historique de {fund.Name} -> {e.Message}");
                 }
             }
+        }
+
+        private void Settings_Click(object _1, RoutedEventArgs _2)
+        {
+            _ = ContentFrame.Navigate(typeof(SettingsPage), ViewModel);
+            NavView.Header = "Paramètres";
+
+        }
+
+        private void Flyout_Opened(object _1, object _2)
+        {
+            ViewModel.LogLines = Log.Lines;
         }
     }
 }

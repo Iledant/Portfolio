@@ -2,20 +2,9 @@
 
 namespace Portfolio.ViewModel
 {
-    public class DBViewModel : Bindable
+    public class LogViewModel : Bindable
     {
-        private bool _dbOk = false;
         private List<LogLine> _logLines;
-
-        public bool DBOk
-        {
-            get => _dbOk;
-            set
-            {
-                _dbOk = value;
-                OnPropertyChanged(nameof(DBOk));
-            }
-        }
 
         public List<LogLine> LogLines
         {

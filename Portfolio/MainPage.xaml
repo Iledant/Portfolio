@@ -4,26 +4,53 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="using:System"
     xmlns:local="using:Portfolio"
-    xmlns:local1="using:YahooFinanceApi"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Loaded="Page_Loaded"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+    <Page.BottomAppBar>
+        <CommandBar ClosedDisplayMode="Compact" OverflowButtonVisibility="Collapsed" DefaultLabelPosition="Right">
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Icon="Setting" Click="Settings_Click" ToolTipService.ToolTip="Paramètres"/>
+                <AppBarButton Icon="AllApps">
+                    <AppBarButton.Flyout>
+                        <Flyout Opened="Flyout_Opened">
+                            <ListView x:Name="LogFlyoutListView" ItemsSource="{x:Bind ViewModel.LogLines, Mode=OneWay}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="Padding" Value="2" />
+                                        <Setter Property="MinHeight" Value="0"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="local:LogLine">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="{x:Bind sys:String.Format('{0:HH:mm:ss}',Date)}" Foreground="{x:Bind StateColor}"/>
+                                            <TextBlock Text="{x:Bind Message}" Foreground="{x:Bind StateColor}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Flyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </CommandBar.PrimaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
     <NavigationView 
         x:Name="NavView" 
-        IsSettingsVisible="True" 
         ItemInvoked="NavView_ItemInvoked" 
         Tag="NavView"
         IsBackEnabled="True"
+        IsSettingsVisible="False"
         BackRequested="NavView_BackRequested">
         <NavigationView.MenuItems>
-            <NavigationViewItem Tag="companies" Content="Compagnies" Icon="Home" />
+            <NavigationViewItem Tag="portfolios" Content="Portefeuilles" Icon="Folder" />
             <NavigationViewItem Tag="funds" Content="Fonds" Icon="Page2" />
             <NavigationViewItem Tag="fundSearch" Content="Recherche de fonds" Icon="Zoom" />
-            <NavigationViewItem Tag="portfolios" Content="Portefeuilles" Icon="Folder" />
-            <NavigationViewItem Tag="logs" Content="Log" Icon="List" />
+            <NavigationViewItem Tag="companies" Content="Compagnies" Icon="Home" />
         </NavigationView.MenuItems>
         <ScrollViewer>
             <Frame x:Name="ContentFrame" IsTabStop="True"/>

@@ -156,9 +156,6 @@
     <Compile Include="Pages\FundsPage.xaml.cs">
       <DependentUpon>FundsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\LogPage.xaml.cs">
-      <DependentUpon>LogPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\PortFolioEditPage.xaml.cs">
       <DependentUpon>PortFolioEditPage.xaml</DependentUpon>
     </Compile>
@@ -187,8 +184,8 @@
     <Compile Include="ViewModel\DBViewModel.cs" />
     <Compile Include="ViewModel\FundsViewModel.cs" />
     <Compile Include="ViewModel\FundViewModel.cs" />
+    <Compile Include="ViewModel\LogViewModel.cs" />
     <Compile Include="ViewModel\YahooFinanceViewModel.cs" />
-    <Compile Include="ViewModel\LogPageViewModel.cs" />
     <Compile Include="ViewModel\PortFolioLineViewModel.cs" />
     <Compile Include="ViewModel\PortFoliosViewModel.cs" />
     <Compile Include="ViewModel\PortFolioViewModel.cs" />
@@ -246,10 +243,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\FundsPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\LogPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
