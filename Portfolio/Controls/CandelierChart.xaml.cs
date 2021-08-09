@@ -199,7 +199,7 @@ namespace Portfolio.Controls
         {
             if (Values.Count == 0)
             {
-                Log.AddLine("Appel de chart sans aucune valeurs à représenter");
+                Log.AddLine("Appel de chart sans aucune valeurs à représenter", LogState.Warning);
                 return;
             }
             GetMinMaxVal();
@@ -241,7 +241,7 @@ namespace Portfolio.Controls
         {
             if (_maxVal <= 0)
             {
-                Log.AddLine("Valeur maximale négaitve ou nulle");
+                Log.AddLine("Valeur maximale négaitve ou nulle", LogState.Error);
                 return;
             }
 
