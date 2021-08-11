@@ -39,21 +39,13 @@ namespace Portfolio.Pages
             ViewModel.Fetch(_portfolio, e.Text);
         }
 
-        private async void RemoveCommand_ExecuteRequested(XamlUICommand _, ExecuteRequestedEventArgs args)
+        private void RemoveCommand_ExecuteRequested(XamlUICommand _, ExecuteRequestedEventArgs args)
         {
             if (args == null || args.Parameter == null)
             {
                 return;
             }
-
-            DeleteDialog deleteDialog = new("la compagnie");
-
-            ContentDialogResult result = await deleteDialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                PortFolioLine line = args.Parameter as PortFolioLine;
-                ViewModel.Delete(_portfolio, line, _search);
-            }
+            ShowDeleteDialogAndHandle(args.Parameter as PortFolioLine);
         }
 
         private void AddButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
@@ -82,6 +74,36 @@ namespace Portfolio.Pages
         private void Page_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             ViewModel.Fetch(_portfolio, "");
+        }
+
+        private void ListView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            if (ListView.SelectedItem is not null)
+            {
+                PortFolioLineEditDialog dialog = new(ListView.SelectedItem as PortFolioLine);
+                ShowDialogAndUpdate(dialog);
+            }
+        }
+
+        private void DeleteKeyInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            if (ListView.SelectedItem is not null)
+            {
+                ShowDeleteDialogAndHandle(ListView.SelectedItem as PortFolioLine);
+            }
+            args.Handled = true;
+        }
+
+        private async void ShowDeleteDialogAndHandle(PortFolioLine line)
+        {
+            DeleteDialog deleteDialog = new("la ligne");
+
+            ContentDialogResult result = await deleteDialog.ShowAsync();
+            
+            if (result == ContentDialogResult.Primary)
+            {
+                ViewModel.Delete(_portfolio, line, _search);
+            }
         }
     }
 }

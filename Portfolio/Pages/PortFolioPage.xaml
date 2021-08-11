@@ -21,6 +21,9 @@
             <XamlUICommand.IconSource>
                 <SymbolIconSource Symbol="Remove"/>
             </XamlUICommand.IconSource>
+            <XamlUICommand.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Delete" />
+            </XamlUICommand.KeyboardAccelerators>
         </XamlUICommand>
         <XamlUICommand
             x:Name="UIModifyCommand"
@@ -43,13 +46,24 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" x:Name="AddButton" Click="AddButton_Click">Ajouter</Button>
+            <Button Grid.Column="0" x:Name="AddButton" Click="AddButton_Click">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Add" Modifiers="Control" />
+                </Button.KeyboardAccelerators>
+                Ajouter
+            </Button>
             <local:DebounceSearch Grid.Column="1" x:Name="Search" TextChanged="Search_TextChanged" />
         </Grid>
         <GridView 
             x:Name="ListView"
             ItemsSource="{x:Bind ViewModel.Lines, Mode=OneWay}"
-            Margin="0,20,0,0">
+            Margin="0,20,0,0"
+            IsDoubleTapEnabled="True"
+            DoubleTapped="ListView_DoubleTapped">
+            <GridView.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Delete" Invoked="DeleteKeyInvoked">
+                </KeyboardAccelerator>
+            </GridView.KeyboardAccelerators>
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local1:PortFolioLine">
                     <UserControl>
