@@ -1,4 +1,5 @@
-﻿using Portfolio.Models;
+﻿using Portfolio.Dialogs;
+using Portfolio.Models;
 using Portfolio.ViewModel;
 using System;
 using Windows.UI.Xaml.Controls;
@@ -13,7 +14,7 @@ namespace Portfolio.Pages
     public sealed partial class PortFolioPage : Page
     {
         private PortFolio _portfolio;
-        private string _search;
+        private string _search = "";
         private readonly PortFolioViewModel ViewModel;
 
         public PortFolioPage()
@@ -55,26 +56,26 @@ namespace Portfolio.Pages
             }
         }
 
-        private void AddCommand_ExecuteRequested(XamlUICommand _1, ExecuteRequestedEventArgs _2)
-        {
-            AddPortFolioLine();
-        }
-
-        private void AddPortFolioLine()
-        {
-            _ = Frame.Navigate(typeof(PortFolioLineEditPage), new PortFolioLine(portFolioID: _portfolio.ID));
-        }
-
         private void AddButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            AddPortFolioLine();
+            ShowDialogAndUpdate(new PortFolioLineEditDialog(new PortFolioLine(portFolioID: _portfolio.ID)));
         }
 
         private void ModifyCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             if (args.Parameter is not null and PortFolioLine)
             {
-                _ = Frame.Navigate(typeof(PortFolioLineEditPage), args.Parameter as PortFolioLine);
+                PortFolioLineEditDialog dialog = new(args.Parameter as PortFolioLine);
+                ShowDialogAndUpdate(dialog);
+            }
+        }
+
+        private async void ShowDialogAndUpdate(PortFolioLineEditDialog dialog)
+        {
+            ContentDialogResult result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                ViewModel.Fetch(_portfolio, _search);
             }
         }
 

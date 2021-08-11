@@ -31,15 +31,6 @@
                 <SymbolIconSource Symbol="Edit"/>
             </XamlUICommand.IconSource>
         </XamlUICommand>
-        <XamlUICommand
-            x:Name="UIAddCommand"
-            ExecuteRequested="AddCommand_ExecuteRequested"
-            Description="Ajouter un fond"
-            Label="Ajouter">
-            <XamlUICommand.IconSource>
-                <SymbolIconSource Symbol="Add"/>
-            </XamlUICommand.IconSource>
-        </XamlUICommand>
     </Page.Resources>
 
     <StackPanel Orientation="Vertical" Padding="12" Spacing="6">
@@ -84,10 +75,6 @@
                                     CommandParameter="{x:Bind }"/>
                                 <MenuFlyoutItem 
                                     Command="{StaticResource UIModifyCommand}" 
-                                    CommandParameter="{x:Bind }"/>
-                                <MenuFlyoutSeparator />
-                                <MenuFlyoutItem 
-                                    Command="{StaticResource UIAddCommand}" 
                                     CommandParameter="{x:Bind }"/>
                             </MenuFlyout>
                         </UserControl.ContextFlyout>
