@@ -1,6 +1,9 @@
-﻿using Portfolio.Models;
+﻿using Portfolio.Dialogs;
+using Portfolio.Models;
+using Portfolio.Repositories;
 using Portfolio.ViewModel;
 using System;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -50,9 +53,8 @@ namespace Portfolio.Pages
             }
 
             Company company = args.Parameter as Company;
-            _ = Frame.Navigate(typeof(CompanyNameEdit), company);
+            ShowEditDialogAndHandle(company);
         }
-
 
         private void SearchBox_DataContextChanged(object _, DebounceSearchEventArgs e)
         {
@@ -62,12 +64,39 @@ namespace Portfolio.Pages
 
         private void AddCommand_ExecuteRequested(XamlUICommand _1, ExecuteRequestedEventArgs _2)
         {
-            _ = Frame.Navigate(typeof(CompanyNameEdit), new Company());
+            ShowEditDialogAndHandle(new Company());
         }
 
         private void AddButton_Click(object _1, RoutedEventArgs _2)
         {
-            _ = Frame.Navigate(typeof(CompanyNameEdit), new Company());
+            ShowEditDialogAndHandle(new Company());
+        }
+
+        private async void ShowEditDialogAndHandle(Company company)
+        {
+            CompanyEditDialog dialog = new(company);
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                if (DB.State == DBState.AlreadyExists)
+                {
+                    AlreadyExistsStackPannel.Visibility = Visibility.Visible;
+                    await Task.Delay(2000);
+                    AlreadyExistsStackPannel.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    ViewModel.Fetch(_search);
+                }
+            }
+        }
+
+        private void CompaniesGridView_DoubleTapped(object _1, DoubleTappedRoutedEventArgs _2)
+        {
+            if (CompaniesGridView.SelectedItem is not null)
+            {
+                ShowEditDialogAndHandle(CompaniesGridView.SelectedItem as Company);
+            }
         }
     }
 }

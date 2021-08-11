@@ -124,6 +124,9 @@
     <Compile Include="Controls\CandelierChart.xaml.cs">
       <DependentUpon>CandelierChart.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\CompanyEditDialog.xaml.cs">
+      <DependentUpon>CompanyEditDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\PortfolioLineEditDialog.xaml.cs">
       <DependentUpon>PortfolioLineEditDialog.xaml</DependentUpon>
     </Compile>
@@ -139,9 +142,6 @@
     <Compile Include="Models\PortFolioLine.cs" />
     <Compile Include="Pages\CompaniesPage .xaml.cs">
       <DependentUpon>CompaniesPage .xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\CompanyNameEdit.xaml.cs">
-      <DependentUpon>CompanyNameEdit.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\DebounceSearch.xaml.cs">
       <DependentUpon>DebounceSearch.xaml</DependentUpon>
@@ -223,6 +223,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\CompanyEditDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\PortfolioLineEditDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -232,10 +236,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\CompaniesPage .xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\CompanyNameEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

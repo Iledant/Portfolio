@@ -2,6 +2,7 @@
 
 using Npgsql;
 using Portfolio.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Portfolio.Repositories
@@ -31,7 +32,7 @@ namespace Portfolio.Repositories
             return companies;
         }
 
-        public static DBState Insert(Company company)
+        public static void Insert(Company company)
         {
             NpgsqlConnection? con = DB.GetConnection();
             string query = $"INSERT INTO company (name,comment) VALUES(@name,@comment);";
@@ -42,15 +43,19 @@ namespace Portfolio.Repositories
             try
             {
                 _ = cmd.ExecuteNonQuery();
+                DB.State = DBState.OK;
             }
             catch (PostgresException exception)
             {
                 if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    return DBState.AlreadyExists;
+                    DB.State = DBState.AlreadyExists;
                 }
             }
-            return DBState.OK;
+            catch (Exception)
+            {
+                DB.State = DBState.Error;
+            }
         }
 
         public static DBState Update(Company company)

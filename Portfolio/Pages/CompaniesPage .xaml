@@ -55,7 +55,16 @@
             <Button Grid.Column="0" x:Name="AddButton" Click="AddButton_Click">Ajouter</Button>
             <local:DebounceSearch Grid.Column="1" x:Name="Search" TextChanged="SearchBox_DataContextChanged" />
         </Grid>
-        <GridView ItemsSource="{x:Bind ViewModel.Companies, Mode=OneWay}" Margin="0,20,0,0">
+        <StackPanel x:Name="AlreadyExistsStackPannel" Background="#200" Orientation="Horizontal" Spacing="6" Padding="12" Visibility="Collapsed">
+            <SymbolIcon Symbol="ReportHacked" Foreground="Red" />
+            <TextBlock Text="La compagnie existe déjà" Foreground="Red" />
+        </StackPanel>
+        <GridView 
+            x:Name="CompaniesGridView"
+            ItemsSource="{x:Bind ViewModel.Companies, Mode=OneWay}"
+            Margin="0,20,0,0"
+            IsDoubleTapEnabled="True"
+            DoubleTapped="CompaniesGridView_DoubleTapped">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local1:Company">
                     <UserControl>
