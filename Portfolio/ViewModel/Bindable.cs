@@ -19,7 +19,7 @@ namespace Portfolio.ViewModel
             if (date is not null)
             {
                 DateTime d = (DateTime)date;
-                return prefix + d.ToString("dd/mm/yy");
+                return prefix + d.ToString("dd/MM/yy");
             }
             return prefix + "-";
         }
