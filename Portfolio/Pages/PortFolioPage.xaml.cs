@@ -28,7 +28,6 @@ namespace Portfolio.Pages
             if (e.Parameter is PortFolio and not null)
             {
                 _portfolio = e.Parameter as PortFolio;
-                Title.Text = $"Portefeuille : {_portfolio.Name}";
             }
             base.OnNavigatedTo(e);
         }

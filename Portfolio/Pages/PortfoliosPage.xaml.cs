@@ -79,14 +79,14 @@ namespace Portfolio.Pages
             {
                 return;
             }
-            _ = Frame.Navigate(typeof(PortFolioPage), PortFoliosList.SelectedItem);
+            _ = Frame.Navigate(typeof(PortFolioMainPage), PortFoliosList.SelectedItem);
         }
 
         private void DetailCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             if (args.Parameter is not null and PortFolio)
             {
-                _ = Frame.Navigate(typeof(PortFolioPage), args.Parameter);
+                _ = Frame.Navigate(typeof(PortFolioMainPage), args.Parameter);
             }
         }
     }

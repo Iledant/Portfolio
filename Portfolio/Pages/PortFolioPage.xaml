@@ -37,10 +37,6 @@
     </Page.Resources>
 
     <StackPanel Orientation="Vertical" Padding="12" Spacing="6">
-        <StackPanel Orientation="Horizontal" Spacing="12"  Margin="0,0,0,24">
-            <Rectangle Fill="CadetBlue" Width="6"/>
-            <TextBlock x:Name="Title" Text="Portefeuille" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-        </StackPanel>
         <Grid ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />

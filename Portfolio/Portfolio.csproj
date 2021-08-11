@@ -156,14 +156,23 @@
     <Compile Include="Pages\FundEditPage.xaml.cs">
       <DependentUpon>FundEditPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\PortFolioMainPage.xaml.cs">
+      <DependentUpon>PortFolioMainPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\FundsPage.xaml.cs">
       <DependentUpon>FundsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PortFolioEditPage.xaml.cs">
       <DependentUpon>PortFolioEditPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\PortFolioHistoricalPage.xaml.cs">
+      <DependentUpon>PortFolioHistoricalPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\PortFolioPage.xaml.cs">
       <DependentUpon>PortFolioPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\PortFolioPerformancePage.xaml.cs">
+      <DependentUpon>PortFolioPerformancePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PortfoliosPage.xaml.cs">
       <DependentUpon>PortfoliosPage.xaml</DependentUpon>
@@ -246,6 +255,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\PortFolioMainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\FundsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -254,7 +267,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\PortFolioHistoricalPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\PortFolioPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\PortFolioPerformancePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
