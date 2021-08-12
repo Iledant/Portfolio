@@ -61,11 +61,6 @@ namespace Portfolio.Pages
             ViewModel.Fetch(_search);
         }
 
-        private void AddCommand_ExecuteRequested(XamlUICommand _1, ExecuteRequestedEventArgs _2)
-        {
-            _ = Frame.Navigate(typeof(FundEditPage), new Fund());
-        }
-
         private void AddButton_Click(object _1, RoutedEventArgs _2)
         {
             _ = Frame.Navigate(typeof(FundEditPage), new Fund());

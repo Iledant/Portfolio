@@ -31,15 +31,6 @@
                 <SymbolIconSource Symbol="Edit"/>
             </XamlUICommand.IconSource>
         </XamlUICommand>
-        <XamlUICommand
-            x:Name="UIAddCommand"
-            ExecuteRequested="AddCommand_ExecuteRequested"
-            Description="Créer un nouveau fond"
-            Label="Créer">
-            <XamlUICommand.IconSource>
-                <SymbolIconSource Symbol="Add"/>
-            </XamlUICommand.IconSource>
-        </XamlUICommand>
     </Page.Resources>
 
     <StackPanel Padding="12" Spacing="6">
@@ -52,7 +43,12 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Click="AddButton_Click" x:Name="AddButton">Ajouter</Button>
+            <Button Click="AddButton_Click" x:Name="AddButton">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Add" Modifiers="Control" />
+                </Button.KeyboardAccelerators>
+                Ajouter
+            </Button>
             <local:DebounceSearch Grid.Column="1" x:Name="SearchBox" TextChanged="SearchBox_DataContextChanged" />
         </Grid>
         <GridView 
