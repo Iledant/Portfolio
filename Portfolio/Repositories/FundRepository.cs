@@ -87,7 +87,7 @@ namespace Portfolio.Repositories
             return funds;
         }
 
-        public static DBState Insert(Fund fund)
+        public static void Insert(Fund fund)
         {
             NpgsqlConnection? con = DB.GetConnection();
             string query = "INSERT INTO fund (name,comment,isin,yahoo_code,company_id) VALUES(@name,@comment,@isin,@yahoo_code,@company_id);";
@@ -103,18 +103,19 @@ namespace Portfolio.Repositories
             try
             {
                 _ = cmd.ExecuteNonQuery();
+                DB.State = DBState.OK;
             }
             catch (PostgresException exception)
             {
                 if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    return DBState.AlreadyExists;
+                    DB.State = DBState.AlreadyExists;
                 }
+                DB.State = DBState.Error;
             }
-            return DBState.OK;
         }
 
-        public static DBState Update(Fund fund)
+        public static void Update(Fund fund)
         {
             NpgsqlConnection? con = DB.GetConnection();
             string query = "UPDATE fund SET name=@name,comment=@comment,isin=@isin," +
@@ -137,10 +138,10 @@ namespace Portfolio.Repositories
             {
                 if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    return DBState.AlreadyExists;
+                    DB.State = DBState.AlreadyExists;
                 }
+                DB.State = DBState.Error;
             }
-            return DBState.OK;
         }
 
         public static void Delete(Fund fund)
