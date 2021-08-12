@@ -130,6 +130,9 @@
     <Compile Include="Dialogs\FundEditDialog.xaml.cs">
       <DependentUpon>FundEditDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\PortfolioEditDialog.xaml.cs">
+      <DependentUpon>PortfolioEditDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\PortfolioLineEditDialog.xaml.cs">
       <DependentUpon>PortfolioLineEditDialog.xaml</DependentUpon>
     </Compile>
@@ -161,9 +164,6 @@
     </Compile>
     <Compile Include="Pages\FundsPage.xaml.cs">
       <DependentUpon>FundsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PortFolioEditPage.xaml.cs">
-      <DependentUpon>PortFolioEditPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PortFolioHistoricalPage.xaml.cs">
       <DependentUpon>PortFolioHistoricalPage.xaml</DependentUpon>
@@ -231,6 +231,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\PortfolioEditDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\PortfolioLineEditDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -260,10 +264,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\FundsPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PortFolioEditPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

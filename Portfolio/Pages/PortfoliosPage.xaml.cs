@@ -1,4 +1,6 @@
-﻿using Portfolio.Models;
+﻿using Portfolio.Dialogs;
+using Portfolio.Models;
+using Portfolio.Repositories;
 using Portfolio.ViewModel;
 using System;
 using Windows.UI.Xaml.Controls;
@@ -12,7 +14,7 @@ namespace Portfolio.Pages
     public sealed partial class PortfoliosPage : Page
     {
         private readonly PortFoliosViewModel ViewModel;
-        private string _search;
+        private string _search = "";
 
         public PortfoliosPage()
         {
@@ -54,8 +56,7 @@ namespace Portfolio.Pages
                 return;
             }
 
-            PortFolio portfolio = args.Parameter as PortFolio;
-            _ = Frame.Navigate(typeof(PortFolioEditPage), portfolio);
+            ShowEditDialogAndHandle(args.Parameter as PortFolio);
         }
 
         private void AddButton_Click(object _1, Windows.UI.Xaml.RoutedEventArgs _2)
@@ -65,7 +66,7 @@ namespace Portfolio.Pages
 
         private void AddPortFolio()
         {
-            _ = Frame.Navigate(typeof(PortFolioEditPage), new PortFolio());
+            ShowEditDialogAndHandle(new PortFolio());
         }
 
         private void ListView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -82,6 +83,24 @@ namespace Portfolio.Pages
             if (args.Parameter is not null and PortFolio)
             {
                 _ = Frame.Navigate(typeof(PortFolioMainPage), args.Parameter);
+            }
+        }
+
+        private async void ShowEditDialogAndHandle(PortFolio portfolio)
+        {
+            PortfolioEditDialog dialog = new(portfolio);
+            ContentDialogResult result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                if (DB.State == DBState.AlreadyExists)
+                {
+
+                }
+                else
+                {
+                    ViewModel.Fetch(_search);
+                }
             }
         }
     }
