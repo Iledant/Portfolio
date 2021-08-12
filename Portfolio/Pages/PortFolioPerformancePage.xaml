@@ -8,7 +8,32 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-
+    <Grid x:Name="Table" Padding="12" PointerMoved="Table_PointerMoved" PointerExited="Table_PointerExited">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="0" Padding="6">
+            <TextBlock Text="Fond" TextAlignment="Center" Foreground="Black" />
+        </Border>
+        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="1" Padding="6">
+            <TextBlock Text="Quantité" TextAlignment="Center" Foreground="Black"/>
+        </Border>
+        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="2" Padding="6">
+            <TextBlock Text="PRM" TextAlignment="Center" Foreground="Black"/>
+        </Border>
+        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="3" Padding="6">
+            <TextBlock Text="Valeur" TextAlignment="Center" Foreground="Black"/>
+        </Border>
+        <Border Background="CadetBlue"  Grid.Row="0" Grid.Column="4" Padding="6">
+            <TextBlock Text="Perf." TextAlignment="Center" Foreground="Black"/>
+        </Border>
     </Grid>
 </Page>

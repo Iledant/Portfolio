@@ -143,16 +143,19 @@ namespace Portfolio.Repositories
         public static List<PortFolioLineValue> GetActualValue(int portfolioID)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "WITH fond_list as (select id from portfolio_line where portfolio_id=1), " +
-                 "date_fund_list as (select id, fund_id, quantity, date from portfolio_line where date is not null and average_val is null), " +
-                 "avg_fund_list as (select id, fund_id, average_val from portfolio_line where average_val is not null), " +
-                 "cal_avg_fund_list as (select pl.id,pl.fund_id,fd.val as average_val FROM date_fund_list pl JOIN fund_data fd ON pl.fund_id = fd.fund_id AND pl.date = fd.date), " +
-                 "all_values as (select* FROM cal_avg_fund_list UNION ALL select *FROM avg_fund_list), " +
-                 "max_date as (select max(date) as date,fund_id FROM fund_data GROUP BY 2) " +
+            string query = "WITH fond_list AS (SELECT id FROM portfolio_line WHERE portfolio_id=1), " +
+                 "date_fund_list AS (SELECT id, fund_id, quantity, date" +
+                 "  FROM portfolio_line WHERE date is not null AND average_val is null), " +
+                 "avg_fund_list AS (SELECT id, fund_id, average_val " +
+                 "  FROM portfolio_line WHERE average_val is not null), " +
+                 "cal_avg_fund_list AS (SELECT pl.id,pl.fund_id,fd.val AS average_val " +
+                 "  FROM date_fund_list pl JOIN fund_data fd ON pl.fund_id = fd.fund_id AND pl.date = fd.date), " +
+                 "all_values AS (SELECT* FROM cal_avg_fund_list UNION ALL SELECT * FROM avg_fund_list), " +
+                 "max_date AS (SELECT MAX(date) AS date,fund_id FROM fund_data GROUP BY 2) " +
                  "SELECT f.id,f.name,fd.val,pl.quantity,av.average_val " +
                 "FROM all_values av " +
                 $"JOIN portfolio_line pl ON av.id = pl.id AND pl.portfolio_id = {portfolioID} " +
-                "JOIN max_date md ON av.fund_id = md.fund_id " +
+                "JOIN MAX_date md ON av.fund_id = md.fund_id " +
                 "JOIN fund_data fd ON av.fund_id = fd.fund_id AND fd.date = md.date " +
                 "JOIN fund f ON av.fund_id = f.id";
             using NpgsqlCommand? cmd = new(query, con);
@@ -173,17 +176,22 @@ namespace Portfolio.Repositories
         public static List<FundData> GetHistorical(int portfolioID, DateTime? begin = null, DateTime? end = null)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "WITH fond_list as (select id from portfolio_line where portfolio_id=1), " +
-                "date_fund_list as (select id, fund_id, quantity, date from portfolio_line where date is not null and average_val is null), " +
-                "avg_fund_list as (select id, fund_id, average_val from portfolio_line where average_val is not null), " +
-                "cal_avg_fund_list as (select pl.id,pl.fund_id,fd.val as average_val FROM date_fund_list pl JOIN fund_data fd ON pl.fund_id = fd.fund_id AND pl.date = fd.date), " +
-                $"date_limits as (select min(date) as min,max(date) as max FROM fund_data WHERE fund_id IN(SELECT fund_id FROM portfolio WHERE id = {portfolioID})) " +
+            string query = "WITH fond_list AS (SELECT id FROM portfolio_line WHERE portfolio_id=1), " +
+                "date_fund_list AS (SELECT id, fund_id, quantity, date " +
+                "   FROM portfolio_line WHERE date is NOT null and average_val is null), " +
+                "avg_fund_list AS (SELECT id, fund_id, average_val " +
+                "   FROM portfolio_line WHERE average_val is NOT null), " +
+                "cal_avg_fund_list AS (SELECT pl.id,pl.fund_id,fd.val AS average_val " +
+                "   FROM date_fund_list pl JOIN fund_data fd ON pl.fund_id = fd.fund_id AND pl.date = fd.date), " +
+                $"date_limits AS (SELECT min(date) AS min,max(date) AS max " +
+                $"  FROM fund_data WHERE fund_id IN (SELECT fund_id FROM portfolio WHERE id = {portfolioID})) " +
                 "SELECT fd.date,sum(fd.val * pl.quantity) " +
                 "FROM portfolio_line pl " +
                 "JOIN fund f ON pl.fund_id = f.id " +
                 "JOIN fund_data fd ON fd.fund_id = f.id " +
-                "WHERE pl.portfolio_id = 1 AND fd.date >= (select min from date_limits) AND fd.date <= (select max from date_limits) AND fd.date >= @begin AND fd.date <= @end " +
-                "group by 1 order by 1";
+                "WHERE pl.portfolio_id = 1 AND fd.date >= (SELECT min FROM date_limits) " +
+                "   AND fd.date <= (SELECT max FROM date_limits) AND fd.date >= @begin AND fd.date <= @end " +
+                "GROUP BY 1 ORDER BY 1";
             using NpgsqlCommand? cmd = new(query, con);
             _ = cmd.Parameters.AddWithValue("begin", begin ?? DateTime.MinValue);
             _ = cmd.Parameters.AddWithValue("end", end ?? DateTime.MaxValue);
