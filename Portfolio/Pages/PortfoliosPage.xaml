@@ -94,10 +94,6 @@
                                 <MenuFlyoutItem 
                                     Command="{StaticResource UIDetailCommand}" 
                                     CommandParameter="{x:Bind }"/>
-                                <MenuFlyoutSeparator />
-                                <MenuFlyoutItem 
-                                    Command="{StaticResource UIAddCommand}" 
-                                    CommandParameter="{x:Bind }"/>
                             </MenuFlyout>
                         </UserControl.ContextFlyout>
                     </UserControl>
