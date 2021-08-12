@@ -31,15 +31,6 @@
                 <SymbolIconSource Symbol="Edit"/>
             </XamlUICommand.IconSource>
         </XamlUICommand>
-        <XamlUICommand
-            x:Name="UIAddCommand"
-            ExecuteRequested="AddCommand_ExecuteRequested"
-            Description="Créer une nouvelle compagnie"
-            Label="Créer">
-            <XamlUICommand.IconSource>
-                <SymbolIconSource Symbol="Add"/>
-            </XamlUICommand.IconSource>
-        </XamlUICommand>
     </Page.Resources>
 
     <StackPanel Padding="12" Spacing="6">
@@ -52,7 +43,12 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" x:Name="AddButton" Click="AddButton_Click">Ajouter</Button>
+            <Button Grid.Column="0" x:Name="AddButton" Click="AddButton_Click">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Add" Modifiers="Control" />
+                </Button.KeyboardAccelerators>
+                Ajouter
+            </Button>
             <local:DebounceSearch Grid.Column="1" x:Name="Search" TextChanged="SearchBox_DataContextChanged" />
         </Grid>
         <StackPanel x:Name="AlreadyExistsStackPannel" Background="#200" Orientation="Horizontal" Spacing="6" Padding="12" Visibility="Collapsed">
