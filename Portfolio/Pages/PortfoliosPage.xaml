@@ -40,15 +40,6 @@
                 <SymbolIconSource Symbol="Zoom"/>
             </XamlUICommand.IconSource>
         </XamlUICommand>
-        <XamlUICommand
-            x:Name="UIAddCommand"
-            ExecuteRequested="AddCommand_ExecuteRequested"
-            Description="Créer un nouveau portefeuille"
-            Label="Créer">
-            <XamlUICommand.IconSource>
-                <SymbolIconSource Symbol="Add"/>
-            </XamlUICommand.IconSource>
-        </XamlUICommand>
     </Page.Resources>
 
     <StackPanel Padding="12" Spacing="6" Orientation="Vertical">
@@ -64,7 +55,12 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" x:Name="AddButton" Click="AddButton_Click">Ajouter</Button>
+            <Button Grid.Column="0" x:Name="AddButton" Click="AddButton_Click">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Add" Modifiers="Control" />
+                </Button.KeyboardAccelerators>
+                Ajouter
+            </Button>
             <local:DebounceSearch Grid.Column="1" x:Name="SearchBox" TextChanged="SearchBox_DataContextChanged" />
         </Grid>
         <GridView 

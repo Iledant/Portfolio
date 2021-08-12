@@ -58,11 +58,6 @@ namespace Portfolio.Pages
             _ = Frame.Navigate(typeof(PortFolioEditPage), portfolio);
         }
 
-        private void AddCommand_ExecuteRequested(XamlUICommand _1, ExecuteRequestedEventArgs _2)
-        {
-            AddPortFolio();
-        }
-
         private void AddButton_Click(object _1, Windows.UI.Xaml.RoutedEventArgs _2)
         {
             AddPortFolio();
