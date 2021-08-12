@@ -194,6 +194,7 @@
     <Compile Include="ViewModel\FundsViewModel.cs" />
     <Compile Include="ViewModel\FundViewModel.cs" />
     <Compile Include="ViewModel\LogViewModel.cs" />
+    <Compile Include="ViewModel\PortfolioHistoricalViewModel.cs" />
     <Compile Include="ViewModel\YahooFinanceViewModel.cs" />
     <Compile Include="ViewModel\PortFolioLineViewModel.cs" />
     <Compile Include="ViewModel\PortFoliosViewModel.cs" />

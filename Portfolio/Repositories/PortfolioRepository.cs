@@ -29,18 +29,6 @@ namespace Portfolio.Repositories
         }
     }
 
-    public class PortFolioHistoricalLine
-    {
-        public readonly DateTime Date;
-        public readonly double Value;
-
-        public PortFolioHistoricalLine(DateTime date, double value)
-        {
-            Date = date;
-            Value = value;
-        }
-    }
-
     public static class PortfolioRepository
     {
         public static List<PortFolio> Get(string pattern)
@@ -182,7 +170,7 @@ namespace Portfolio.Repositories
             return lines;
         }
 
-        public static List<PortFolioHistoricalLine> GetHistorical(int portfolioID, DateTime? begin = null, DateTime? end = null)
+        public static List<FundData> GetHistorical(int portfolioID, DateTime? begin = null, DateTime? end = null)
         {
             NpgsqlConnection? con = DB.GetConnection();
             string query = "WITH fond_list as (select id from portfolio_line where portfolio_id=1), " +
@@ -194,16 +182,16 @@ namespace Portfolio.Repositories
                 "FROM portfolio_line pl " +
                 "JOIN fund f ON pl.fund_id = f.id " +
                 "JOIN fund_data fd ON fd.fund_id = f.id " +
-                "WHERE pl.portfolio_id = 1 AND fd.date >= (select min from date_limits) AND fd.date <= (select max from date_limits) AND fd.date >= @begin AND fd.date <= @end" +
+                "WHERE pl.portfolio_id = 1 AND fd.date >= (select min from date_limits) AND fd.date <= (select max from date_limits) AND fd.date >= @begin AND fd.date <= @end " +
                 "group by 1 order by 1";
             using NpgsqlCommand? cmd = new(query, con);
-            cmd.Parameters.AddWithValue("begin", begin ?? DateTime.MinValue);
-            cmd.Parameters.AddWithValue("end", end ?? DateTime.MaxValue);
-            List<PortFolioHistoricalLine> lines = new();
+            _ = cmd.Parameters.AddWithValue("begin", begin ?? DateTime.MinValue);
+            _ = cmd.Parameters.AddWithValue("end", end ?? DateTime.MaxValue);
+            List<FundData> lines = new();
             using NpgsqlDataReader? reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                lines.Add(new(date: reader.GetDateTime(0), value: reader.GetDouble(1)));
+                lines.Add(new(id: 0, fundId: 0, date: reader.GetDateTime(0), val: reader.GetDouble(1)));
             }
             return lines;
         }
