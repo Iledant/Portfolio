@@ -1,10 +1,11 @@
 ﻿using Portfolio.Models;
 using Portfolio.ViewModel;
+using Portfolio.Dialogs;
 using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-
+using Portfolio.Repositories;
 
 namespace Portfolio.Pages
 {
@@ -15,6 +16,8 @@ namespace Portfolio.Pages
     {
         private readonly FundsViewModel ViewModel;
         private string _search;
+
+        public object FundEditContentDialog { get; private set; }
 
         public FundsPage()
         {
@@ -50,8 +53,7 @@ namespace Portfolio.Pages
                 return;
             }
 
-            Fund fund = args.Parameter as Fund;
-            _ = Frame.Navigate(typeof(FundEditPage), fund);
+            ShowEditDialogAndHandle( args.Parameter as Fund);
         }
 
 
@@ -63,7 +65,7 @@ namespace Portfolio.Pages
 
         private void AddButton_Click(object _1, RoutedEventArgs _2)
         {
-            _ = Frame.Navigate(typeof(FundEditPage), new Fund());
+            ShowEditDialogAndHandle(new Fund());
         }
 
         private void GridView_DoubleTapped(object _1, DoubleTappedRoutedEventArgs _2)
@@ -74,6 +76,24 @@ namespace Portfolio.Pages
             }
             _ = Frame.Navigate(typeof(FundChartPage), FundsList.SelectedItem);
 
+        }
+
+        private async void ShowEditDialogAndHandle(Fund fund)
+        {
+            FundEditDialog dialog = new(fund);
+            ContentDialogResult result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                if (DB.State == DBState.AlreadyExists)
+                {
+
+                }
+                else
+                {
+                    ViewModel.Fetch(_search);
+                }
+            }
         }
     }
 }
