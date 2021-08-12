@@ -79,7 +79,7 @@ namespace Portfolio.Repositories
                 comment: Repository.ReadNullableString(reader, 2));
         }
 
-        public static DBState Insert(PortFolio portfolio)
+        public static void Insert(PortFolio portfolio)
         {
             NpgsqlConnection? con = DB.GetConnection();
             string query = $"INSERT INTO portfolio (name,comment) VALUES(@name,@comment);";
@@ -90,18 +90,19 @@ namespace Portfolio.Repositories
             try
             {
                 _ = cmd.ExecuteNonQuery();
+                DB.State = DBState.OK;
             }
             catch (PostgresException exception)
             {
                 if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    return DBState.AlreadyExists;
+                    DB.State = DBState.AlreadyExists;
                 }
+                DB.State = DBState.Error;
             }
-            return DBState.OK;
         }
 
-        public static DBState Update(PortFolio portfolio)
+        public static void Update(PortFolio portfolio)
         {
             NpgsqlConnection? con = DB.GetConnection();
             string query = $"UPDATE portfolio SET name=@name,comment=@comment WHERE id=@id;";
@@ -118,10 +119,10 @@ namespace Portfolio.Repositories
             {
                 if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    return DBState.AlreadyExists;
+                    DB.State = DBState.AlreadyExists;
                 }
+                DB.State = DBState.Error;
             }
-            return DBState.OK;
         }
 
         public static void Delete(PortFolio portfolio)
