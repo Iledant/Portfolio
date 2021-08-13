@@ -25,7 +25,7 @@ namespace Portfolio.Repositories
             Quantity = quantity;
             AverageValue = averageValue;
             Evolution = fundActualValue / averageValue - 1.0;
-            Gain = Evolution * Quantity;
+            Gain = (FundActualValue - AverageValue) * Quantity;
         }
     }
 
@@ -168,7 +168,7 @@ namespace Portfolio.Repositories
                     fundName: reader.GetString(1),
                     fundActualValue: reader.GetDouble(2),
                     quantity: reader.GetDouble(3),
-                    averageValue: reader.GetDouble(3)));
+                    averageValue: reader.GetDouble(4)));
             }
             return lines;
         }
