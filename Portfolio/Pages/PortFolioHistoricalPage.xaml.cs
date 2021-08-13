@@ -20,6 +20,7 @@ namespace Portfolio.Pages
     {
         private PortFolio _portfolio;
         private readonly PortfolioHistoricalViewModel ViewModel;
+        private DateTime? _since = null;
 
         public PortFolioHistoricalPage()
         {
@@ -29,17 +30,21 @@ namespace Portfolio.Pages
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter is null or not PortFolio)
+            if (e.Parameter is not PortFolio)
             {
                 throw new ArgumentException();
             }
             _portfolio = e.Parameter as PortFolio;
-
+            ViewModel.FetchValues(_portfolio, _since);
             base.OnNavigatedTo(e);
         }
 
         private void PeriodComboBox_PeriodChanged(object _1, PeriodChangedEventArgs e)
         {
+            if (e is not null)
+            {
+                _since = e.Since;
+            }
             if (e is null || _portfolio is null)
             {
                 return;
