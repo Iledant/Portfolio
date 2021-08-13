@@ -183,12 +183,14 @@ namespace Portfolio.Repositories
             _ = insertCmd.ExecuteNonQuery();
         }
 
-        public static List<FundData> GetFundDatas(int fundID)
+        public static List<FundData> GetFundDatas(int fundID, DateTime? since = null)
         {
+            since ??= DateTime.MinValue;
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT id,date,val FROM fund_data WHERE fund_id=@fund_id";
+            string query = "SELECT id,date,val FROM fund_data WHERE fund_id=@fund_id AND date >= @since";
             using NpgsqlCommand? cmd = new(query, con);
-            cmd.Parameters.AddWithValue("fund_id", fundID);
+            _ = cmd.Parameters.AddWithValue("fund_id", fundID);
+            _ = cmd.Parameters.AddWithValue("since", since);
             List<FundData> datas = new();
             using NpgsqlDataReader? reader = cmd.ExecuteReader();
             while (reader.Read())

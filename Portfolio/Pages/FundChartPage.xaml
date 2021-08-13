@@ -37,6 +37,7 @@
             <TextBlock Grid.Column="0" Grid.Row="4" Text="Commentaire" />
             <TextBlock Grid.Column="1" Grid.Row="4" x:Name="CommentTextBlock" />
         </Grid>
+        <controls:PeriodComboBox x:Name="PeriodComboBox" PeriodChanged="PeriodComboBox_PeriodChanged" HorizontalAlignment="Center" />
         <controls:CandelierChart x:Name="Chart" Stroke="YellowGreen" Height="500" Margin="0,14,0,0"/>
     </StackPanel>
 </Page>
