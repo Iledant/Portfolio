@@ -20,20 +20,60 @@ namespace Portfolio.Pages
     /// </summary>
     public sealed partial class PortFolioPerformancePage : Page
     {
+        #region private members
         private PortFolio _portfolio;
-        private Thickness _cellPadding = new(6);
         private readonly CultureInfo _ci = new("fr-FR");
-        private readonly SolidColorBrush _cellBackground = new(Color.FromArgb(255, 10, 10, 10));
-        private readonly SolidColorBrush _pointeredCellBackground = new(Color.FromArgb(255, 20,20,20));
         private double _tableHeight;
         private int _rowsCount;
         private int _pointeredRow = 0;
+        #endregion
 
+        #region constructor
         public PortFolioPerformancePage()
         {
             InitializeComponent();
         }
+        #endregion
 
+        #region property dependency
+        public Brush CellBackground
+        {
+            get { return (Brush)GetValue(CellBackgroundProperty); }
+            set { SetValue(CellBackgroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty CellBackgroundProperty =
+            DependencyProperty.Register(nameof(CellBackground),
+                typeof(Brush),
+                typeof(PortFolioPerformancePage),
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 10,16,16))));
+
+        public Brush PointeredCellBackground
+        {
+            get { return (Brush)GetValue(PointeredCellBackgroundProperty); }
+            set { SetValue(PointeredCellBackgroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty PointeredCellBackgroundProperty =
+            DependencyProperty.Register(nameof(PointeredCellBackground),
+                typeof(Brush),
+                typeof(PortFolioPerformancePage),
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 19, 31, 32))));
+
+        public Thickness CellPadding
+        {
+            get { return (Thickness)GetValue(CellPaddingProperty); }
+            set { SetValue(CellPaddingProperty, value); }
+        }
+
+        public static readonly DependencyProperty CellPaddingProperty =
+            DependencyProperty.Register(nameof(CellPadding),
+                typeof(int),
+                typeof(PortFolioPerformancePage),
+                new PropertyMetadata(new Thickness(6)));
+        #endregion
+
+        #region events methods
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             if (e.Parameter is not PortFolio)
@@ -46,6 +86,38 @@ namespace Portfolio.Pages
             base.OnNavigatedTo(e);
         }
 
+        private void Table_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            Pointer ptr = e.Pointer;
+            if (ptr.PointerDeviceType == PointerDeviceType.Mouse)
+            {
+                PointerPoint point = e.GetCurrentPoint(Table);
+                int row = (int)(point.Position.Y * _rowsCount / _tableHeight);
+                if (row != _pointeredRow)
+                {
+                    ClearPointeredRow();
+                    if (row > 0)
+                    {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            Border border = Table.Children[6 * row + i] as Border;
+                            border.Background = PointeredCellBackground;
+                        }
+                    }
+                    _pointeredRow = row;
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void Table_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            ClearPointeredRow();
+            _pointeredRow = 0;
+        }
+        #endregion
+
+        #region private methods
         private void FetchValuesAndGenerateTable()
         {
             List<PortFolioLineValue> values = PortfolioRepository.GetActualValue(_portfolio.ID);
@@ -64,6 +136,7 @@ namespace Portfolio.Pages
                 AddCell(values[i].AverageValue.ToString("C", _ci), TextAlignment.Left, 2, i + 1);
                 AddCell(values[i].FundActualValue.ToString("C", _ci), TextAlignment.Left, 3, i + 1);
                 AddCell(values[i].Gain.ToString("C", _ci), TextAlignment.Left, 4, i + 1);
+                AddCell(values[i].Evolution.ToString("P", _ci), TextAlignment.Left, 5, i + 1);
             }
             Table.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             _tableHeight = Table.DesiredSize.Height;
@@ -77,35 +150,11 @@ namespace Portfolio.Pages
             textblock.TextAlignment = alignment;
             Border border = new();
             border.Child = textblock;
-            border.Padding = _cellPadding;
-            border.Background = _cellBackground;
+            border.Padding = CellPadding;
+            border.Background = CellBackground;
             Table.Children.Add(border);
             Grid.SetColumn(border, column);
             Grid.SetRow(border, row);
-        }
-
-        private void Table_PointerMoved(object sender, PointerRoutedEventArgs e)
-        {
-            Pointer ptr = e.Pointer;
-            if (ptr.PointerDeviceType == PointerDeviceType.Mouse)
-            {
-                PointerPoint point = e.GetCurrentPoint(Table);
-                int row = (int)(point.Position.Y * _rowsCount / _tableHeight);
-                if (row != _pointeredRow)
-                {
-                    ClearPointeredRow();
-                    if (row > 0)
-                    {
-                        for (int i = 0; i < 5; i++)
-                        {
-                            Border border = Table.Children[5 * row + i] as Border;
-                            border.Background = _pointeredCellBackground;
-                        }
-                    }
-                    _pointeredRow = row;
-                }
-            }
-            e.Handled = true;
         }
 
         private void ClearPointeredRow()
@@ -115,16 +164,11 @@ namespace Portfolio.Pages
                 return;
             }
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
-                (Table.Children[5 * _pointeredRow + i] as Border).Background = _cellBackground;
+                (Table.Children[6 * _pointeredRow + i] as Border).Background = CellBackground;
             }
         }
-
-        private void Table_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            ClearPointeredRow();
-            _pointeredRow = 0;
-        }
+        #endregion
     }
 }

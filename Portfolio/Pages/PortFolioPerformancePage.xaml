@@ -16,23 +16,27 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="0" Padding="6">
+        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="0" Padding="{x:Bind CellPadding}">
             <TextBlock Text="Fond" TextAlignment="Center" Foreground="Black" />
         </Border>
-        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="1" Padding="6">
+        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="1" Padding="{x:Bind CellPadding}">
             <TextBlock Text="Quantité" TextAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="2" Padding="6">
+        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="2" Padding="{x:Bind CellPadding}">
             <TextBlock Text="PRM" TextAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="3" Padding="6">
+        <Border Background="CadetBlue" Grid.Row="0" Grid.Column="3" Padding="{x:Bind CellPadding}">
             <TextBlock Text="Valeur" TextAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border Background="CadetBlue"  Grid.Row="0" Grid.Column="4" Padding="6">
+        <Border Background="CadetBlue"  Grid.Row="0" Grid.Column="4" Padding="{x:Bind CellPadding}">
+            <TextBlock Text="Gain" TextAlignment="Center" Foreground="Black"/>
+        </Border>
+        <Border Background="CadetBlue"  Grid.Row="0" Grid.Column="5" Padding="{x:Bind CellPadding}">
             <TextBlock Text="Perf." TextAlignment="Center" Foreground="Black"/>
         </Border>
     </Grid>
