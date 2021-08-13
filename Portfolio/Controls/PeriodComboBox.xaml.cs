@@ -32,9 +32,11 @@ namespace Portfolio.Controls
         private void FillComboBox()
         {
             _periods.Add(new HistoricalPeriod { DisplayText = "Tout l'historique", Since = null });
+            _periods.Add(new HistoricalPeriod { DisplayText = "2 ans", Since = DateTime.Now.AddYears(-2) });
             _periods.Add(new HistoricalPeriod { DisplayText = "Un an", Since = DateTime.Now.AddYears(-1) });
             _periods.Add(new HistoricalPeriod { DisplayText = "6 mois", Since = DateTime.Now.AddMonths(-6) });
             _periods.Add(new HistoricalPeriod { DisplayText = "3 mois", Since = DateTime.Now.AddMonths(-3) });
+            _periods.Add(new HistoricalPeriod { DisplayText = "2 mois", Since = DateTime.Now.AddMonths(-2) });
             _periods.Add(new HistoricalPeriod { DisplayText = "1 mois", Since = DateTime.Now.AddMonths(-1) });
             Combo.ItemsSource = _periods;
             Combo.SelectedIndex = 0;
