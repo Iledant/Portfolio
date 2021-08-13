@@ -9,13 +9,14 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <StackPanel Orientation="Vertical">
-        <ComboBox x:Name="PeriodComboBox" SelectionChanged="PeriodComboBox_SelectionChanged" Header="Période">
+        <!--<ComboBox x:Name="PeriodComboBox" SelectionChanged="PeriodComboBox_SelectionChanged" Header="Période">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="local:HistoricalPeriod">
                     <TextBlock Text="{x:Bind DisplayText}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
-        </ComboBox>
+        </ComboBox>-->
+        <controls:PeriodComboBox PeriodChanged="PeriodComboBox_PeriodChanged" />
         <controls:CandelierChart  Height="500" Values="{x:Bind ViewModel.Values, Mode=OneWay}" Stroke="CadetBlue"/>
     </StackPanel>
 </Page>
