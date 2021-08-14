@@ -8,6 +8,28 @@ namespace Portfolio.ViewModel
     public class PortfolioHistoricalViewModel : Bindable
     {
         private List<FundData> _values = new();
+        private bool _isAverageEnabled;
+        private int _averageCount = 5;
+
+        public bool IsAverageEnabled
+        {
+            get => _isAverageEnabled;
+            set
+            {
+                _isAverageEnabled = value;
+                OnPropertyChanged(nameof(IsAverageEnabled));
+            }
+        }
+
+        public int AverageCount
+        {
+            get => _averageCount;
+            set
+            {
+                _averageCount = value;
+                OnPropertyChanged(nameof(AverageCount));
+            }
+        }
 
         public List<FundData> Values
         {

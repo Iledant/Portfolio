@@ -1,6 +1,6 @@
 ﻿namespace Portfolio.ViewModel
 {
-    class FundChartViewModel : Bindable
+    public class AverageChartViewModel : Bindable
     {
         private bool _isAverageEnabled;
         private int _averageCount = 5;

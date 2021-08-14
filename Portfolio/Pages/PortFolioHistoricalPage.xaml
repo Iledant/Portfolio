@@ -10,6 +10,10 @@
 
     <StackPanel Orientation="Vertical" Spacing="6">
         <controls:PeriodComboBox PeriodChanged="PeriodComboBox_PeriodChanged" HorizontalAlignment="Center"/>
-        <controls:CandelierChart  Height="500" Values="{x:Bind ViewModel.Values, Mode=OneWay}" Stroke="CadetBlue"/>
+        <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+            <CheckBox IsChecked="{x:Bind ViewModel.IsAverageEnabled, Mode=TwoWay}" Content="Ajouter la moyenne" />
+            <Slider Width="200" Minimum="5" Maximum="30" Value="{x:Bind ViewModel.AverageCount, Mode=TwoWay}" />
+        </StackPanel>
+        <controls:CandelierChart  Height="500" Values="{x:Bind ViewModel.Values, Mode=OneWay}" Stroke="CadetBlue" IsAverageEnabled="{x:Bind ViewModel.IsAverageEnabled, Mode=OneWay}" AverageCount="{x:Bind ViewModel.AverageCount, Mode=OneWay}"/>
     </StackPanel>
 </Page>

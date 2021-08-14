@@ -15,7 +15,7 @@ namespace Portfolio.Pages
     {
         private Fund _fund;
         private DateTime? _since = null;
-        private readonly FundChartViewModel ViewModel;
+        private readonly AverageChartViewModel ViewModel;
 
         public FundChartPage()
         {
