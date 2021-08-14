@@ -16,7 +16,6 @@ namespace Portfolio.Controls
     public sealed partial class CandelierChart : UserControl
     {
         #region PrivateMembers
-
         private double _minVal;
         private double _maxVal;
         private double _verticalAxisMinVal;
@@ -33,11 +32,10 @@ namespace Portfolio.Controls
         private string _horizontalAxisTextFormat;
         private Line[] _horizontalAxisTickMarks;
         private TextBlock[] _horizontalLabelTextBoxes;
-
+        private List<FundData> _averageValues;
         #endregion
 
         #region DependencyProperties
-
         public Brush ChartBackground
         {
             get => (Brush)GetValue(ChartBackgroundProperty);
@@ -101,6 +99,23 @@ namespace Portfolio.Controls
                 typeof(Brush),
                 typeof(CandelierChart),
                 new PropertyMetadata(Application.Current.Resources["ButtonBorderThemeBrush"] as Brush));
+
+        public Brush AverageStroke
+        {
+            get => (Brush)GetValue(AverageStrokeProperty);
+            set
+            {
+                SetValue(AverageStrokeProperty, value);
+                GenerateChart();
+            }
+        }
+
+        public static readonly DependencyProperty AverageStrokeProperty =
+            DependencyProperty.Register(
+                nameof(AverageStroke),
+                typeof(Brush),
+                typeof(CandelierChart),
+                new PropertyMetadata(new SolidColorBrush(Colors.White)));
 
         public double StrokeThickness
         {
@@ -178,10 +193,37 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty InnerMarginProperty =
             DependencyProperty.Register(nameof(InnerMargin), typeof(int), typeof(CandelierChart), new PropertyMetadata(3));
 
+        public bool IsAverageEnabled
+        {
+            get { return (bool)GetValue(IsAverageEnabledProperty); }
+            set { 
+                SetValue(IsAverageEnabledProperty, value);
+                GenerateChart();
+            }
+        }
+
+        public static readonly DependencyProperty IsAverageEnabledProperty =
+            DependencyProperty.Register(nameof(IsAverageEnabled), typeof(bool), typeof(CandelierChart), new PropertyMetadata(false));
+
+
+
+        public int AverageCount
+        {
+            get { return (int)GetValue(AverageCountProperty); }
+            set { 
+                SetValue(AverageCountProperty, value);
+                GenerateChart();
+            }
+        }
+
+        // Using a DependencyProperty as the backing store for AverageCount.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AverageCountProperty =
+            DependencyProperty.Register(nameof(AverageCount), typeof(int), typeof(CandelierChart), new PropertyMetadata(5));
+
+
         #endregion
 
         #region Constructor
-
         public CandelierChart()
         {
             InitializeComponent();
@@ -190,11 +232,9 @@ namespace Portfolio.Controls
             _horizontalAxisTickMarks = new Line[0];
             _horizontalLabelTextBoxes = new TextBlock[0];
         }
-
         #endregion
 
         #region PrivateMethods
-
         private void GenerateChart()
         {
             if (Values.Count == 0)
@@ -216,6 +256,15 @@ namespace Portfolio.Controls
             DrawHorizontalTicks();
             DrawHorizontalLabels();
             DrawPolyline();
+            if (IsAverageEnabled)
+            {
+                AverageLine.Visibility = Visibility.Visible;
+                DrawAveragePolyline();
+            }
+            else
+            {
+                AverageLine.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void GetMinMaxVal()
@@ -347,6 +396,41 @@ namespace Portfolio.Controls
             }
 
             ValueLine.Points = points;
+        }
+
+        private void DrawAveragePolyline()
+        {
+            PointCollection points = new();
+            _averageValues = new();
+            double mean = 1 / ((double)AverageCount);
+            
+            if (Values.Count < AverageCount + 1)
+            {
+                Log.AddLine("Nombre de valeurs insuffisante pour dessiner la moyenne");
+                return;
+            }
+
+            double stack = Values[0].Val;
+            for (int i = 1; i< AverageCount; i++)
+            {
+                stack += Values[i].Val;
+            }
+            _averageValues.Add(new(id: 0, fundId: 0, val: stack * mean, date: Values[AverageCount - 1].Date));
+
+            for (int i = AverageCount; i < Values.Count; i++)
+            {
+                stack += Values[i].Val - Values[i - AverageCount].Val;
+                _averageValues.Add(new(id: 0, fundId: 0, val: stack * mean, date: Values[i].Date));
+            }
+
+            foreach (FundData data in _averageValues)
+            {
+                points.Add(new Point(
+                    (int)((data.Date.Ticks - _firstTicks) * _horizontalScale + VerticalAxis.X1),
+                    (int)((_verticalAxisMaxVal - data.Val) * _verticalScale + ChartPadding)));
+            }
+
+            AverageLine.Points = points;
         }
 
         private void DrawAxes()
