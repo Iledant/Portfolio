@@ -38,6 +38,16 @@
             <TextBlock Grid.Column="1" Grid.Row="4" x:Name="CommentTextBlock" />
         </Grid>
         <controls:PeriodComboBox x:Name="PeriodComboBox" PeriodChanged="PeriodComboBox_PeriodChanged" HorizontalAlignment="Center" />
-        <controls:CandelierChart x:Name="Chart" Stroke="YellowGreen" Height="500" Margin="0,14,0,0"/>
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="12">
+            <CheckBox IsChecked="{x:Bind ViewModel.IsAverageEnabled, Mode=TwoWay}" Content="Ajouter la moyenne"/>
+            <Slider Width="200" Minimum="5" Maximum="30" Value="{x:Bind ViewModel.AverageCount, Mode=TwoWay}"/>
+        </StackPanel>
+        <controls:CandelierChart 
+            x:Name="Chart"
+            Stroke="YellowGreen"
+            Height="500"
+            Margin="0,14,0,0"
+            IsAverageEnabled="{x:Bind ViewModel.IsAverageEnabled, Mode=OneWay}"
+            AverageCount="{x:Bind ViewModel.AverageCount, Mode=OneWay}"/>
     </StackPanel>
 </Page>

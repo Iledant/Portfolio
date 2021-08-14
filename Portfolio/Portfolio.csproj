@@ -194,6 +194,7 @@
     <Compile Include="ViewModel\CompaniesViewModel.cs" />
     <Compile Include="ViewModel\Converters.cs" />
     <Compile Include="ViewModel\DBViewModel.cs" />
+    <Compile Include="ViewModel\FundChartViewModel.cs" />
     <Compile Include="ViewModel\FundsViewModel.cs" />
     <Compile Include="ViewModel\FundViewModel.cs" />
     <Compile Include="ViewModel\LogViewModel.cs" />

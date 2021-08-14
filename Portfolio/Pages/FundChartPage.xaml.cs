@@ -1,5 +1,6 @@
 ﻿using Portfolio.Models;
 using Portfolio.Repositories;
+using Portfolio.ViewModel;
 using System;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -14,10 +15,12 @@ namespace Portfolio.Pages
     {
         private Fund _fund;
         private DateTime? _since = null;
+        private readonly FundChartViewModel ViewModel;
 
         public FundChartPage()
         {
             InitializeComponent();
+            ViewModel = new();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
