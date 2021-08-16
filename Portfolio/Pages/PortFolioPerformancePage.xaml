@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Portfolio.Pages"
+    xmlns:controls="using:Portfolio.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -19,25 +20,43 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Border Background="CadetBlue" Grid.Row="0" Grid.Column="0" Padding="{x:Bind CellPadding}">
-            <TextBlock Text="Fond" TextAlignment="Center" Foreground="Black" />
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Fond" TextAlignment="Center" Foreground="Black" />
+                <controls:SmallSortHeaderIcon x:Name="FundSort" State="{x:Bind ViewModel.FundHeaderState, Mode=OneWay}" Clicked="FundSort_Clicked"/>
+            </StackPanel>
         </Border>
         <Border Background="CadetBlue" Grid.Row="0" Grid.Column="1" Padding="{x:Bind CellPadding}">
-            <TextBlock Text="Quantité" TextAlignment="Center" Foreground="Black"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Quantité" TextAlignment="Center" Foreground="Black"/>
+                <controls:SmallSortHeaderIcon x:Name="QuantitySort" State="{x:Bind ViewModel.QuantityHeaderState, Mode=OneWay}" Clicked="QuantitySort_Clicked"/>
+            </StackPanel>
         </Border>
         <Border Background="CadetBlue" Grid.Row="0" Grid.Column="2" Padding="{x:Bind CellPadding}">
-            <TextBlock Text="PRM" TextAlignment="Center" Foreground="Black"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="PRM" TextAlignment="Center" Foreground="Black"/>
+                <controls:SmallSortHeaderIcon x:Name="AverageValueSort" State="{x:Bind ViewModel.AverageValueHeaderState, Mode=OneWay}" Clicked="AverageValueSort_Clicked"/>
+            </StackPanel>
         </Border>
         <Border Background="CadetBlue" Grid.Row="0" Grid.Column="3" Padding="{x:Bind CellPadding}">
-            <TextBlock Text="Valeur" TextAlignment="Center" Foreground="Black"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Valeur" TextAlignment="Center" Foreground="Black"/>
+                <controls:SmallSortHeaderIcon x:Name="ValueSort" State="{x:Bind ViewModel.ValueHeaderState, Mode=OneWay}" Clicked="ValueSort_Clicked"/>
+            </StackPanel>
         </Border>
         <Border Background="CadetBlue"  Grid.Row="0" Grid.Column="4" Padding="{x:Bind CellPadding}">
-            <TextBlock Text="Gain" TextAlignment="Center" Foreground="Black"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Gain" TextAlignment="Center" Foreground="Black"/>
+                <controls:SmallSortHeaderIcon x:Name="GainSort" State="{x:Bind ViewModel.GainHeaderState, Mode=OneWay}" Clicked="GainSort_Clicked"/>
+            </StackPanel>
         </Border>
         <Border Background="CadetBlue"  Grid.Row="0" Grid.Column="5" Padding="{x:Bind CellPadding}">
-            <TextBlock Text="Perf." TextAlignment="Center" Foreground="Black"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Perf." TextAlignment="Center" Foreground="Black"/>
+                <controls:SmallSortHeaderIcon x:Name="PerformanceSort" State="{x:Bind ViewModel.PerformanceHeaderState, Mode=OneWay}" Clicked="PerformanceSort_Clicked"/>
+            </StackPanel>
         </Border>
     </Grid>
 </Page>

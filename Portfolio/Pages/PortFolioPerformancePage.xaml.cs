@@ -1,5 +1,6 @@
 ﻿using Portfolio.Models;
 using Portfolio.Repositories;
+using Portfolio.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -26,12 +27,14 @@ namespace Portfolio.Pages
         private double _tableHeight;
         private int _rowsCount;
         private int _pointeredRow = 0;
+        private readonly PortfolioPerformanceViewModel ViewModel;
         #endregion
 
         #region constructor
         public PortFolioPerformancePage()
         {
             InitializeComponent();
+            ViewModel = new();
         }
         #endregion
 
@@ -114,6 +117,36 @@ namespace Portfolio.Pages
         {
             ClearPointeredRow();
             _pointeredRow = 0;
+        }
+
+        private void FundSort_Clicked(object sender, EventArgs e)
+        {
+            ViewModel.SelectHeader(HeaderName.Fund);
+        }
+
+        private void QuantitySort_Clicked(object sender, EventArgs e)
+        {
+            ViewModel.SelectHeader(HeaderName.Quantity);
+        }
+
+        private void AverageValueSort_Clicked(object sender, EventArgs e)
+        {
+            ViewModel.SelectHeader(HeaderName.AverageValue);
+        }
+
+        private void ValueSort_Clicked(object sender, EventArgs e)
+        {
+            ViewModel.SelectHeader(HeaderName.Value);
+        }
+
+        private void GainSort_Clicked(object sender, EventArgs e)
+        {
+            ViewModel.SelectHeader(HeaderName.Gain);
+        }
+
+        private void PerformanceSort_Clicked(object sender, EventArgs e)
+        {
+            ViewModel.SelectHeader(HeaderName.Performance);
         }
         #endregion
 
