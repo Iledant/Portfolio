@@ -119,29 +119,24 @@ namespace Portfolio.ViewModel
 
         private void NotifyChange(HeaderName name)
         {
-            switch (name)
+            string propertyName = name switch
             {
-                case HeaderName.None:
-                    break;
-                case HeaderName.Fund:
-                    OnPropertyChanged(nameof(FundHeaderState));
-                    break;
-                case HeaderName.Quantity:
-                    OnPropertyChanged(nameof(QuantityHeaderState));
-                    break;
-                case HeaderName.AverageValue:
-                    OnPropertyChanged(nameof(AverageValueHeaderState));
-                    break;
-                case HeaderName.Value:
-                    OnPropertyChanged(nameof(ValueHeaderState));
-                    break;
-                case HeaderName.Gain:
-                    OnPropertyChanged(nameof(GainHeaderState));
-                    break;
-                case HeaderName.Performance:
-                    OnPropertyChanged(nameof(PerformanceHeaderState));
-                    break;
-            }
-        }
+                HeaderName.None => null,
+                HeaderName.Fund =>
+                    nameof(FundHeaderState),
+                HeaderName.Quantity =>
+                    nameof(QuantityHeaderState),
+                HeaderName.AverageValue =>
+                    nameof(AverageValueHeaderState),
+                HeaderName.Value =>
+                    nameof(ValueHeaderState),
+                HeaderName.Gain =>
+                    nameof(GainHeaderState),
+                HeaderName.Performance =>
+                    nameof(PerformanceHeaderState),
+                _ => throw new ArgumentException()
+            };
+            OnPropertyChanged(propertyName);
+    }
     }
 }
