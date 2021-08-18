@@ -11,8 +11,13 @@ namespace Portfolio.ViewModel
     {
         private HeaderSortState _headerState = HeaderSortState.Ascending;
         private HeaderName _selectedHeader = HeaderName.Fund;
+        private double _totalInitialValue, _totalActualValue, _totalGain, _totalPerformance;
 
         public List<PortFolioLineValue> Values { get; private set; } = new();
+        public double TotalInitialValue => _totalInitialValue;
+        public double TotalActualValue => _totalActualValue;
+        public double TotalGain => _totalGain;
+        public double TotalPerformance => _totalPerformance;
         public HeaderSortState FundHeaderState => GetHeaderState(HeaderName.Fund);
         public HeaderSortState QuantityHeaderState => GetHeaderState(HeaderName.Quantity);
         public HeaderSortState AverageValueHeaderState => GetHeaderState(HeaderName.AverageValue);
@@ -23,6 +28,15 @@ namespace Portfolio.ViewModel
         public void FetchValues(int portfolioID)
         {
             Values = PortfolioRepository.GetActualValue(portfolioID);
+            _totalActualValue = 0;
+            _totalInitialValue = 0;
+            foreach (PortFolioLineValue line in Values)
+            {
+                _totalInitialValue += line.AverageValue * line.Quantity;
+                _totalActualValue += line.FundActualValue * line.Quantity;
+            }
+            _totalGain = _totalActualValue - _totalInitialValue;
+            _totalPerformance = _totalGain / _totalInitialValue;
         }
 
         public void SelectHeader(HeaderName newSelected)
@@ -122,21 +136,15 @@ namespace Portfolio.ViewModel
             string propertyName = name switch
             {
                 HeaderName.None => null,
-                HeaderName.Fund =>
-                    nameof(FundHeaderState),
-                HeaderName.Quantity =>
-                    nameof(QuantityHeaderState),
-                HeaderName.AverageValue =>
-                    nameof(AverageValueHeaderState),
-                HeaderName.Value =>
-                    nameof(ValueHeaderState),
-                HeaderName.Gain =>
-                    nameof(GainHeaderState),
-                HeaderName.Performance =>
-                    nameof(PerformanceHeaderState),
+                HeaderName.Fund => nameof(FundHeaderState),
+                HeaderName.Quantity => nameof(QuantityHeaderState),
+                HeaderName.AverageValue => nameof(AverageValueHeaderState),
+                HeaderName.Value => nameof(ValueHeaderState),
+                HeaderName.Gain => nameof(GainHeaderState),
+                HeaderName.Performance => nameof(PerformanceHeaderState),
                 _ => throw new ArgumentException()
             };
             OnPropertyChanged(propertyName);
-    }
+        }
     }
 }

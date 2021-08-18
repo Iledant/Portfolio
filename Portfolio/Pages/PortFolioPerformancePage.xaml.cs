@@ -22,7 +22,8 @@ namespace Portfolio.Pages
         #region private members
         private PortFolio _portfolio;
         private readonly CultureInfo _ci = new("fr-FR");
-        private double _tableHeight;
+        private double _headerHeight;
+        private double _headerAndCellHeight;
         private int _rowsCount;
         private int _pointeredRow = 0;
         private int _cellBeginIndex = 0;
@@ -49,6 +50,42 @@ namespace Portfolio.Pages
                 typeof(Brush),
                 typeof(PortFolioPerformancePage),
                 new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 10, 16, 16))));
+
+        public Brush CellForeground
+        {
+            get { return (Brush)GetValue(CellForegroundProperty); }
+            set { SetValue(CellForegroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty CellForegroundProperty =
+            DependencyProperty.Register(nameof(CellForeground),
+                typeof(Brush),
+                typeof(PortFolioPerformancePage),
+                new PropertyMetadata(new SolidColorBrush(Colors.White)));
+
+        public Brush HeaderCellBackground
+        {
+            get { return (Brush)GetValue(HeaderCellBackgroundProperty); }
+            set { SetValue(HeaderCellBackgroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty HeaderCellBackgroundProperty =
+            DependencyProperty.Register(nameof(HeaderCellBackground),
+                typeof(Brush),
+                typeof(PortFolioPerformancePage),
+                new PropertyMetadata(new SolidColorBrush(Colors.CadetBlue)));
+
+        public Brush HeaderCellForeground
+        {
+            get { return (Brush)GetValue(HeaderCellForegroundProperty); }
+            set { SetValue(HeaderCellForegroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty HeaderCellForegroundProperty =
+            DependencyProperty.Register(nameof(HeaderCellForeground),
+                typeof(Brush),
+                typeof(PortFolioPerformancePage),
+                new PropertyMetadata(new SolidColorBrush(Colors.Black)));
 
         public Brush PointeredCellBackground
         {
@@ -95,20 +132,32 @@ namespace Portfolio.Pages
             if (ptr.PointerDeviceType == PointerDeviceType.Mouse)
             {
                 PointerPoint point = e.GetCurrentPoint(Table);
-                int row = (int)(point.Position.Y * _rowsCount / _tableHeight);
-                if (row != _pointeredRow)
+                if ((point.Position.Y < _headerHeight || point.Position.Y > _headerAndCellHeight))
                 {
-                    ClearPointeredRow();
-                    if (row > 0)
+                    if (_pointeredRow != 0)
                     {
-                        for (int i = 0; i < 6; i++)
+                        ClearPointeredRow();
+                        _pointeredRow = 0;
+                    }
+                }
+                else
+                {
+                    int row = (int)(point.Position.Y * _rowsCount / _headerAndCellHeight);
+                    if (row != _pointeredRow)
+                    {
+                        ClearPointeredRow();
+                        if (row > 0)
                         {
-                            Border border = Table.Children[6 * row + i] as Border;
-                            border.Background = PointeredCellBackground;
+                            for (int i = 0; i < 6; i++)
+                            {
+                                Border border = Table.Children[6 * row + i] as Border;
+                                border.Background = PointeredCellBackground;
+                            }
+                            _pointeredRow = row;
                         }
                     }
-                    _pointeredRow = row;
                 }
+
             }
             e.Handled = true;
         }
@@ -159,7 +208,9 @@ namespace Portfolio.Pages
         #region private methods
         private void GenerateTable()
         {
-            for (int i = 0; i < ViewModel.Values.Count; i++)
+            Table.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            _headerHeight = Table.DesiredSize.Height;
+            for (int i = 0; i < ViewModel.Values.Count + 1; i++)
             {
                 Table.RowDefinitions.Add(new RowDefinition());
             }
@@ -169,25 +220,33 @@ namespace Portfolio.Pages
             {
                 AddCell(ViewModel.Values[i].FundName, TextAlignment.Left, 0, i + 1);
                 AddCell(ViewModel.Values[i].Quantity.ToString("N2", _ci), TextAlignment.Right, 1, i + 1);
-                AddCell(ViewModel.Values[i].AverageValue.ToString("C", _ci), TextAlignment.Left, 2, i + 1);
-                AddCell(ViewModel.Values[i].FundActualValue.ToString("C", _ci), TextAlignment.Left, 3, i + 1);
-                AddCell(ViewModel.Values[i].Gain.ToString("C", _ci), TextAlignment.Left, 4, i + 1);
-                AddCell(ViewModel.Values[i].Evolution.ToString("P", _ci), TextAlignment.Left, 5, i + 1);
+                AddCell(ViewModel.Values[i].AverageValue.ToString("C", _ci), TextAlignment.Right, 2, i + 1);
+                AddCell(ViewModel.Values[i].FundActualValue.ToString("C", _ci), TextAlignment.Right, 3, i + 1);
+                AddCell(ViewModel.Values[i].Gain.ToString("C", _ci), TextAlignment.Right, 4, i + 1);
+                AddCell(ViewModel.Values[i].Evolution.ToString("P", _ci), TextAlignment.Right, 5, i + 1);
             }
             Table.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            _tableHeight = Table.DesiredSize.Height;
+            _headerAndCellHeight = Table.DesiredSize.Height;
             _rowsCount = ViewModel.Values.Count + 1;
+
+            AddCell("Total", TextAlignment.Left, 0, ViewModel.Values.Count + 2, HeaderCellBackground, HeaderCellForeground);
+            AddCell("", TextAlignment.Right, 1, ViewModel.Values.Count + 2, HeaderCellBackground, HeaderCellForeground);
+            AddCell(ViewModel.TotalInitialValue.ToString("C", _ci), TextAlignment.Right, 2, ViewModel.Values.Count + 2, HeaderCellBackground, HeaderCellForeground);
+            AddCell(ViewModel.TotalActualValue.ToString("C", _ci), TextAlignment.Right, 3, ViewModel.Values.Count + 2, HeaderCellBackground, HeaderCellForeground);
+            AddCell(ViewModel.TotalGain.ToString("C", _ci), TextAlignment.Right, 4, ViewModel.Values.Count + 2, HeaderCellBackground, HeaderCellForeground);
+            AddCell(ViewModel.TotalPerformance.ToString("P", _ci), TextAlignment.Right, 5, ViewModel.Values.Count + 2, HeaderCellBackground, HeaderCellForeground);
         }
 
-        private void AddCell(string text, TextAlignment alignment, int column, int row)
+        private void AddCell(string text, TextAlignment alignment, int column, int row, Brush background = null, Brush foreground = null)
         {
             TextBlock textblock = new();
             textblock.Text = text;
+            textblock.Foreground = foreground ?? CellForeground;
             textblock.TextAlignment = alignment;
             Border border = new();
             border.Child = textblock;
             border.Padding = CellPadding;
-            border.Background = CellBackground;
+            border.Background = background ?? CellBackground;
             Table.Children.Add(border);
             Grid.SetColumn(border, column);
             Grid.SetRow(border, row);
