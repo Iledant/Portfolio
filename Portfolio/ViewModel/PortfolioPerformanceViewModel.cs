@@ -1,4 +1,6 @@
 ﻿using Portfolio.Controls;
+using Portfolio.Repositories;
+using System.Collections.Generic;
 
 namespace Portfolio.ViewModel
 {
@@ -6,15 +8,21 @@ namespace Portfolio.ViewModel
 
     public class PortfolioPerformanceViewModel : Bindable
     {
-        private HeaderSortState _headerState = HeaderSortState.Neutral;
-        private HeaderName _selectedHeader = HeaderName.None;
+        private HeaderSortState _headerState = HeaderSortState.Ascending;
+        private HeaderName _selectedHeader = HeaderName.Fund;
 
+        public List<PortFolioLineValue> Values { get; private set; } = new();
         public HeaderSortState FundHeaderState => GetHeaderState(HeaderName.Fund);
         public HeaderSortState QuantityHeaderState => GetHeaderState(HeaderName.Quantity);
         public HeaderSortState AverageValueHeaderState => GetHeaderState(HeaderName.AverageValue);
         public HeaderSortState ValueHeaderState => GetHeaderState(HeaderName.Value);
         public HeaderSortState GainHeaderState => GetHeaderState(HeaderName.Gain);
         public HeaderSortState PerformanceHeaderState => GetHeaderState(HeaderName.Performance);
+
+        public void FetchValues(int portfolioID)
+        {
+            Values = PortfolioRepository.GetActualValue(portfolioID);
+        }
 
         private HeaderSortState GetHeaderState(HeaderName name)
         {

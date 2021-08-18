@@ -85,6 +85,7 @@ namespace Portfolio.Pages
             }
             _portfolio = e.Parameter as PortFolio;
 
+            ViewModel.FetchValues(_portfolio.ID);
             FetchValuesAndGenerateTable();
             base.OnNavigatedTo(e);
         }
@@ -153,27 +154,26 @@ namespace Portfolio.Pages
         #region private methods
         private void FetchValuesAndGenerateTable()
         {
-            List<PortFolioLineValue> values = PortfolioRepository.GetActualValue(_portfolio.ID);
 
             RowDefinition rowDefinition = new();
             rowDefinition.Height = GridLength.Auto;
-            for (int i = 0; i < values.Count; i++)
+            for (int i = 0; i < ViewModel.Values.Count; i++)
             {
                 Table.RowDefinitions.Add(new RowDefinition());
             }
 
-            for (int i = 0; i < values.Count; i++)
+            for (int i = 0; i < ViewModel.Values.Count; i++)
             {
-                AddCell(values[i].FundName, TextAlignment.Left, 0, i + 1);
-                AddCell(values[i].Quantity.ToString("N2", _ci), TextAlignment.Right, 1, i + 1);
-                AddCell(values[i].AverageValue.ToString("C", _ci), TextAlignment.Left, 2, i + 1);
-                AddCell(values[i].FundActualValue.ToString("C", _ci), TextAlignment.Left, 3, i + 1);
-                AddCell(values[i].Gain.ToString("C", _ci), TextAlignment.Left, 4, i + 1);
-                AddCell(values[i].Evolution.ToString("P", _ci), TextAlignment.Left, 5, i + 1);
+                AddCell(ViewModel.Values[i].FundName, TextAlignment.Left, 0, i + 1);
+                AddCell(ViewModel.Values[i].Quantity.ToString("N2", _ci), TextAlignment.Right, 1, i + 1);
+                AddCell(ViewModel.Values[i].AverageValue.ToString("C", _ci), TextAlignment.Left, 2, i + 1);
+                AddCell(ViewModel.Values[i].FundActualValue.ToString("C", _ci), TextAlignment.Left, 3, i + 1);
+                AddCell(ViewModel.Values[i].Gain.ToString("C", _ci), TextAlignment.Left, 4, i + 1);
+                AddCell(ViewModel.Values[i].Evolution.ToString("P", _ci), TextAlignment.Left, 5, i + 1);
             }
             Table.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             _tableHeight = Table.DesiredSize.Height;
-            _rowsCount = values.Count + 1;
+            _rowsCount = ViewModel.Values.Count + 1;
         }
 
         private void AddCell(string text, TextAlignment alignment, int column, int row)

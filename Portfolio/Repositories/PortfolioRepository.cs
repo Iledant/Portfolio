@@ -157,7 +157,7 @@ namespace Portfolio.Repositories
                 $"JOIN portfolio_line pl ON av.id = pl.id AND pl.portfolio_id = {portfolioID} " +
                 "JOIN MAX_date md ON av.fund_id = md.fund_id " +
                 "JOIN fund_data fd ON av.fund_id = fd.fund_id AND fd.date = md.date " +
-                "JOIN fund f ON av.fund_id = f.id";
+                "JOIN fund f ON av.fund_id = f.id ORDER BY 2";
             using NpgsqlCommand? cmd = new(query, con);
             List<PortFolioLineValue> lines = new();
             using NpgsqlDataReader? reader = cmd.ExecuteReader();
