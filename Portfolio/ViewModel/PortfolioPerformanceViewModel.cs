@@ -1,5 +1,6 @@
 ﻿using Portfolio.Controls;
 using Portfolio.Repositories;
+using System;
 using System.Collections.Generic;
 
 namespace Portfolio.ViewModel
@@ -24,6 +25,68 @@ namespace Portfolio.ViewModel
             Values = PortfolioRepository.GetActualValue(portfolioID);
         }
 
+        private static int IDCompare(PortFolioLineValue a, PortFolioLineValue b) => a.FundID.CompareTo(b.FundID);
+
+        private static int FundAscCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return string.Compare(a.FundName, b.FundName);
+
+        }
+        private static int FundDescCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return -string.Compare(a.FundName, b.FundName);
+        }
+
+        private static int QuantityAscCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return a.Quantity.CompareTo(b.Quantity);
+        }
+
+        private static int QuantityDescCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return -a.Quantity.CompareTo(b.Quantity);
+        }
+
+        private static int AverageValueAscCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return a.AverageValue.CompareTo(b.AverageValue);
+        }
+
+        private static int AverageValueDescCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return -a.AverageValue.CompareTo(b.AverageValue);
+        }
+
+        private static int ValueAscCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return a.FundActualValue.CompareTo(b.FundActualValue);
+        }
+
+        private static int ValueDescCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return -a.FundActualValue.CompareTo(b.FundActualValue);
+        }
+
+        private static int GainAscCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return a.Gain.CompareTo(b.Gain);
+        }
+
+        private static int GainDescCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return -a.Gain.CompareTo(b.Gain);
+        }
+
+        private static int PerformanceAscCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return a.Evolution.CompareTo(b.Evolution);
+        }
+
+        private static int PerformanceDescCompare(PortFolioLineValue a, PortFolioLineValue b)
+        {
+            return -a.Evolution.CompareTo(b.Evolution);
+        }
+
         private HeaderSortState GetHeaderState(HeaderName name)
         {
             return name == _selectedHeader ? _headerState : HeaderSortState.Neutral;
@@ -38,17 +101,57 @@ namespace Portfolio.ViewModel
                 _headerState = HeaderSortState.Ascending;
                 NotifyChange(oldSelected);
                 NotifyChange(newSelected);
+
+            }
+            else
+            {
+                _headerState = _headerState switch
+                {
+                    HeaderSortState.Ascending => HeaderSortState.Descending,
+                    HeaderSortState.Descending => HeaderSortState.Neutral,
+                    HeaderSortState.Neutral => HeaderSortState.Ascending,
+                    _ => throw new NotImplementedException()
+                };
+                NotifyChange(newSelected);
+            }
+
+            SortValues();
+        }
+
+        private void SortValues()
+        {
+            if (_headerState == HeaderSortState.Neutral)
+            {
+                Values.Sort(IDCompare);
                 return;
             }
 
-            _headerState = _headerState switch
+            switch (_selectedHeader)
             {
-                HeaderSortState.Ascending => HeaderSortState.Descending,
-                HeaderSortState.Descending => HeaderSortState.Neutral,
-                HeaderSortState.Neutral => HeaderSortState.Ascending,
-                _ => throw new System.NotImplementedException()
-            };
-            NotifyChange(newSelected);
+                case HeaderName.None:
+                    Values.Sort(IDCompare);
+                    break;
+                case HeaderName.Fund:
+                    Values.Sort(_headerState == HeaderSortState.Ascending ? FundAscCompare : FundDescCompare);
+                    break;
+                case HeaderName.Quantity:
+                    Values.Sort(_headerState == HeaderSortState.Ascending ? QuantityAscCompare : QuantityDescCompare);
+                    break;
+                case HeaderName.AverageValue:
+                    Values.Sort(_headerState == HeaderSortState.Ascending ? AverageValueAscCompare : AverageValueDescCompare);
+                    break;
+                case HeaderName.Value:
+                    Values.Sort(_headerState == HeaderSortState.Ascending ? ValueAscCompare : ValueDescCompare);
+                            break;
+                case HeaderName.Gain:
+                    Values.Sort(_headerState == HeaderSortState.Ascending ? GainAscCompare: GainDescCompare);
+                    break;
+                case HeaderName.Performance:
+                    Values.Sort(_headerState == HeaderSortState.Ascending ? PerformanceAscCompare: PerformanceDescCompare);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         private void NotifyChange(HeaderName name)

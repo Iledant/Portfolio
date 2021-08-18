@@ -1,8 +1,6 @@
 ﻿using Portfolio.Models;
-using Portfolio.Repositories;
 using Portfolio.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using Windows.Devices.Input;
 using Windows.Foundation;
@@ -27,6 +25,7 @@ namespace Portfolio.Pages
         private double _tableHeight;
         private int _rowsCount;
         private int _pointeredRow = 0;
+        private int _cellBeginIndex = 0;
         private readonly PortfolioPerformanceViewModel ViewModel;
         #endregion
 
@@ -49,7 +48,7 @@ namespace Portfolio.Pages
             DependencyProperty.Register(nameof(CellBackground),
                 typeof(Brush),
                 typeof(PortFolioPerformancePage),
-                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 10,16,16))));
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 10, 16, 16))));
 
         public Brush PointeredCellBackground
         {
@@ -86,7 +85,7 @@ namespace Portfolio.Pages
             _portfolio = e.Parameter as PortFolio;
 
             ViewModel.FetchValues(_portfolio.ID);
-            FetchValuesAndGenerateTable();
+            GenerateTable();
             base.OnNavigatedTo(e);
         }
 
@@ -123,45 +122,49 @@ namespace Portfolio.Pages
         private void FundSort_Clicked(object sender, EventArgs e)
         {
             ViewModel.SelectHeader(HeaderName.Fund);
+            UpdateCellTexts();
         }
 
         private void QuantitySort_Clicked(object sender, EventArgs e)
         {
             ViewModel.SelectHeader(HeaderName.Quantity);
+            UpdateCellTexts();
         }
 
         private void AverageValueSort_Clicked(object sender, EventArgs e)
         {
             ViewModel.SelectHeader(HeaderName.AverageValue);
+            UpdateCellTexts();
         }
 
         private void ValueSort_Clicked(object sender, EventArgs e)
         {
             ViewModel.SelectHeader(HeaderName.Value);
+            UpdateCellTexts();
         }
 
         private void GainSort_Clicked(object sender, EventArgs e)
         {
             ViewModel.SelectHeader(HeaderName.Gain);
+            UpdateCellTexts();
         }
 
         private void PerformanceSort_Clicked(object sender, EventArgs e)
         {
             ViewModel.SelectHeader(HeaderName.Performance);
+            UpdateCellTexts();
         }
         #endregion
 
         #region private methods
-        private void FetchValuesAndGenerateTable()
+        private void GenerateTable()
         {
-
-            RowDefinition rowDefinition = new();
-            rowDefinition.Height = GridLength.Auto;
             for (int i = 0; i < ViewModel.Values.Count; i++)
             {
                 Table.RowDefinitions.Add(new RowDefinition());
             }
 
+            _cellBeginIndex = Table.Children.Count;
             for (int i = 0; i < ViewModel.Values.Count; i++)
             {
                 AddCell(ViewModel.Values[i].FundName, TextAlignment.Left, 0, i + 1);
@@ -188,6 +191,33 @@ namespace Portfolio.Pages
             Table.Children.Add(border);
             Grid.SetColumn(border, column);
             Grid.SetRow(border, row);
+        }
+
+        private void UpdateCellTexts()
+        {
+            Border border;
+            TextBlock textblock;
+            for (int i = 0; i < ViewModel.Values.Count; i++)
+            {
+                border = Table.Children[_cellBeginIndex + i * 6] as Border;
+                textblock = border.Child as TextBlock;
+                textblock.Text = ViewModel.Values[i].FundName;
+                border = Table.Children[_cellBeginIndex + i * 6 + 1] as Border;
+                textblock = border.Child as TextBlock;
+                textblock.Text = ViewModel.Values[i].Quantity.ToString("N2", _ci);
+                border = Table.Children[_cellBeginIndex + i * 6 + 2] as Border;
+                textblock = border.Child as TextBlock;
+                textblock.Text = ViewModel.Values[i].AverageValue.ToString("C", _ci);
+                border = Table.Children[_cellBeginIndex + i * 6 + 3] as Border;
+                textblock = border.Child as TextBlock;
+                textblock.Text = ViewModel.Values[i].FundActualValue.ToString("C", _ci);
+                border = Table.Children[_cellBeginIndex + i * 6 + 4] as Border;
+                textblock = border.Child as TextBlock;
+                textblock.Text = ViewModel.Values[i].Gain.ToString("C", _ci);
+                border = Table.Children[_cellBeginIndex + i * 6 + 5] as Border;
+                textblock = border.Child as TextBlock;
+                textblock.Text = ViewModel.Values[i].Evolution.ToString("P", _ci);
+            }
         }
 
         private void ClearPointeredRow()
