@@ -73,12 +73,37 @@ namespace Portfolio.Repositories
             return lines;
         }
 
-        public static DBState Insert(PortFolioLine portfolioLine)
+        public static void Insert(PortFolioLine portfolioLine)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = $"INSERT INTO portfolio_line (date,fund_id,quantity,average_val) " +
+            
+            if (portfolioLine.Quantity < 0)
+            {
+                string checkQuery = "SELECT sum(quantity) FROM portfolio_line WHERE fund_id=@fund_id";
+                using NpgsqlCommand? checkCmd = new(checkQuery, con);
+                _ = checkCmd.Parameters.AddWithValue("fund_id", portfolioLine.FundID);
+                try
+                {
+                    double quantity = -(double)checkCmd.ExecuteScalar();
+                    if (quantity > portfolioLine.Quantity)
+                    {
+                        DB.State = DBState.InvalidQuantity;
+                        return;
+                    }
+                }
+                catch (PostgresException exception)
+                {
+                    if (exception.SqlState != PostgresErrorCodes.NoData)
+                    {
+                        DB.State = DBState.Error;
+                        return;
+                    }
+                }
+            }
+
+            string insertQuery = $"INSERT INTO portfolio_line (date,fund_id,quantity,average_val) " +
                 $"VALUES(@date,@fund_id,@quantity,@average_val);";
-            using NpgsqlCommand? cmd = new(query, con);
+            using NpgsqlCommand? cmd = new(insertQuery, con);
             _ = cmd.Parameters.AddWithValue("date", portfolioLine.Date is null ? DBNull.Value : portfolioLine.Date);
             _ = cmd.Parameters.AddWithValue("fund_id", portfolioLine.FundID);
             _ = cmd.Parameters.AddWithValue("quantity", portfolioLine.Quantity);
@@ -86,15 +111,17 @@ namespace Portfolio.Repositories
             try
             {
                 _ = cmd.ExecuteNonQuery();
+                DB.State = DBState.OK;
             }
             catch (PostgresException exception)
             {
-                if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
+                DB.State = exception.SqlState switch
                 {
-                    return DBState.AlreadyExists;
-                }
+                    PostgresErrorCodes.UniqueViolation => DBState.AlreadyExists,
+                    PostgresErrorCodes.InappropriateAccessModeForBranchTransaction => DBState.NullQuantity,
+                    _ => DBState.Error
+                };
             }
-            return DBState.OK;
         }
 
         public static DBState Update(PortFolioLine portfolioLine)

@@ -27,6 +27,8 @@ namespace Portfolio.Repositories
         OK,
         AlreadyExists,
         NotFound,
+        NullQuantity,
+        InvalidQuantity,
         Error
     }
 
