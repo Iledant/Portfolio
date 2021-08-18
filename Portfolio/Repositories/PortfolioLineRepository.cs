@@ -73,10 +73,8 @@ namespace Portfolio.Repositories
             return lines;
         }
 
-        public static void Insert(PortFolioLine portfolioLine)
+        public static DBState CheckQuantity(NpgsqlConnection? con, PortFolioLine portfolioLine)
         {
-            NpgsqlConnection? con = DB.GetConnection();
-            
             if (portfolioLine.Quantity < 0)
             {
                 string checkQuery = "SELECT sum(quantity) FROM portfolio_line WHERE fund_id=@fund_id";
@@ -87,18 +85,28 @@ namespace Portfolio.Repositories
                     double quantity = -(double)checkCmd.ExecuteScalar();
                     if (quantity > portfolioLine.Quantity)
                     {
-                        DB.State = DBState.InvalidQuantity;
-                        return;
+                        return DBState.InvalidQuantity; ;
                     }
                 }
                 catch (PostgresException exception)
                 {
                     if (exception.SqlState != PostgresErrorCodes.NoData)
                     {
-                        DB.State = DBState.Error;
-                        return;
+                        return DBState.Error;
                     }
                 }
+            }
+            return DBState.OK;
+        }
+
+        public static void Insert(PortFolioLine portfolioLine)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+
+            DBState checkState = CheckQuantity(con, portfolioLine);
+            if (checkState != DBState.OK) {
+                DB.State = checkState;
+                return;
             }
 
             string insertQuery = $"INSERT INTO portfolio_line (date,fund_id,quantity,average_val) " +
@@ -118,15 +126,23 @@ namespace Portfolio.Repositories
                 DB.State = exception.SqlState switch
                 {
                     PostgresErrorCodes.UniqueViolation => DBState.AlreadyExists,
-                    PostgresErrorCodes.InappropriateAccessModeForBranchTransaction => DBState.NullQuantity,
+                    PostgresErrorCodes.IntegrityConstraintViolation => DBState.NullQuantity,
                     _ => DBState.Error
                 };
             }
         }
 
-        public static DBState Update(PortFolioLine portfolioLine)
+        public static void Update(PortFolioLine portfolioLine)
         {
             NpgsqlConnection? con = DB.GetConnection();
+
+            DBState checkState = CheckQuantity(con, portfolioLine);
+            if (checkState != DBState.OK)
+            {
+                DB.State = checkState;
+                return;
+            }
+
             string query = "UPDATE portfolio_line SET date=@date,fund_id=@fund_id,quantity=@quantity,average_val=@average_val " +
                 "WHERE id=@id;";
             using NpgsqlCommand? cmd = new(query, con);
@@ -138,15 +154,17 @@ namespace Portfolio.Repositories
             try
             {
                 _ = cmd.ExecuteNonQuery();
+                DB.State = DBState.OK;
             }
             catch (PostgresException exception)
             {
-                if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
+                DB.State = exception.SqlState switch
                 {
-                    return DBState.AlreadyExists;
-                }
+                    PostgresErrorCodes.UniqueViolation => DBState.AlreadyExists,
+                    PostgresErrorCodes.IntegrityConstraintViolation => DBState.NullQuantity,
+                    _ => DBState.Error
+                };
             }
-            return DBState.OK;
         }
 
         public static void Delete(PortFolioLine portfolio)
