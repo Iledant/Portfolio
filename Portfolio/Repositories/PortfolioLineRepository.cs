@@ -73,7 +73,7 @@ namespace Portfolio.Repositories
             return lines;
         }
 
-        public static DBState CheckQuantity(NpgsqlConnection? con, PortFolioLine portfolioLine)
+        private static DBState CheckQuantity(NpgsqlConnection? con, PortFolioLine portfolioLine)
         {
             if (portfolioLine.Quantity < 0)
             {
@@ -85,7 +85,7 @@ namespace Portfolio.Repositories
                     double quantity = -(double)checkCmd.ExecuteScalar();
                     if (quantity > portfolioLine.Quantity)
                     {
-                        return DBState.InvalidQuantity; ;
+                        return DBState.InvalidQuantity;
                     }
                 }
                 catch (PostgresException exception)
