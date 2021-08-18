@@ -25,73 +25,6 @@ namespace Portfolio.ViewModel
             Values = PortfolioRepository.GetActualValue(portfolioID);
         }
 
-        private static int IDCompare(PortFolioLineValue a, PortFolioLineValue b) => a.FundID.CompareTo(b.FundID);
-
-        private static int FundAscCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return string.Compare(a.FundName, b.FundName);
-
-        }
-        private static int FundDescCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return -string.Compare(a.FundName, b.FundName);
-        }
-
-        private static int QuantityAscCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return a.Quantity.CompareTo(b.Quantity);
-        }
-
-        private static int QuantityDescCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return -a.Quantity.CompareTo(b.Quantity);
-        }
-
-        private static int AverageValueAscCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return a.AverageValue.CompareTo(b.AverageValue);
-        }
-
-        private static int AverageValueDescCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return -a.AverageValue.CompareTo(b.AverageValue);
-        }
-
-        private static int ValueAscCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return a.FundActualValue.CompareTo(b.FundActualValue);
-        }
-
-        private static int ValueDescCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return -a.FundActualValue.CompareTo(b.FundActualValue);
-        }
-
-        private static int GainAscCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return a.Gain.CompareTo(b.Gain);
-        }
-
-        private static int GainDescCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return -a.Gain.CompareTo(b.Gain);
-        }
-
-        private static int PerformanceAscCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return a.Evolution.CompareTo(b.Evolution);
-        }
-
-        private static int PerformanceDescCompare(PortFolioLineValue a, PortFolioLineValue b)
-        {
-            return -a.Evolution.CompareTo(b.Evolution);
-        }
-
-        private HeaderSortState GetHeaderState(HeaderName name)
-        {
-            return name == _selectedHeader ? _headerState : HeaderSortState.Neutral;
-        }
-
         public void SelectHeader(HeaderName newSelected)
         {
             if (newSelected != _selectedHeader)
@@ -118,6 +51,49 @@ namespace Portfolio.ViewModel
             SortValues();
         }
 
+        private static Comparison<PortFolioLineValue> FundCompare(HeaderSortState s)
+        {
+            int sign = s == HeaderSortState.Ascending ? 1 : -1;
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.FundName.CompareTo(b.FundName);
+        }
+
+        private static int IDCompare(PortFolioLineValue a, PortFolioLineValue b) => a.FundID.CompareTo(b.FundID);
+
+        private static Comparison<PortFolioLineValue> QuantityCompare(HeaderSortState s)
+        {
+            int sign = s == HeaderSortState.Ascending ? 1 : -1;
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.Quantity.CompareTo(b.Quantity);
+        }
+
+        private static Comparison<PortFolioLineValue> AverageValueCompare(HeaderSortState s)
+        {
+            int sign = s == HeaderSortState.Ascending ? 1 : -1;
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.AverageValue.CompareTo(b.AverageValue);
+        }
+
+        private static Comparison<PortFolioLineValue> ValueCompare(HeaderSortState s)
+        {
+            int sign = s == HeaderSortState.Ascending ? 1 : -1;
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.FundActualValue.CompareTo(b.FundActualValue);
+        }
+
+        private static Comparison<PortFolioLineValue> GainCompare(HeaderSortState s)
+        {
+            int sign = s == HeaderSortState.Ascending ? 1 : -1;
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.Gain.CompareTo(b.Gain);
+        }
+
+        private static Comparison<PortFolioLineValue> PerformanceCompare(HeaderSortState s)
+        {
+            int sign = s == HeaderSortState.Ascending ? 1 : -1;
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.Evolution.CompareTo(b.Evolution);
+        }
+
+        private HeaderSortState GetHeaderState(HeaderName name)
+        {
+            return name == _selectedHeader ? _headerState : HeaderSortState.Neutral;
+        }
+
         private void SortValues()
         {
             if (_headerState == HeaderSortState.Neutral)
@@ -126,32 +102,19 @@ namespace Portfolio.ViewModel
                 return;
             }
 
-            switch (_selectedHeader)
+            Comparison<PortFolioLineValue> comparer = _selectedHeader switch
             {
-                case HeaderName.None:
-                    Values.Sort(IDCompare);
-                    break;
-                case HeaderName.Fund:
-                    Values.Sort(_headerState == HeaderSortState.Ascending ? FundAscCompare : FundDescCompare);
-                    break;
-                case HeaderName.Quantity:
-                    Values.Sort(_headerState == HeaderSortState.Ascending ? QuantityAscCompare : QuantityDescCompare);
-                    break;
-                case HeaderName.AverageValue:
-                    Values.Sort(_headerState == HeaderSortState.Ascending ? AverageValueAscCompare : AverageValueDescCompare);
-                    break;
-                case HeaderName.Value:
-                    Values.Sort(_headerState == HeaderSortState.Ascending ? ValueAscCompare : ValueDescCompare);
-                            break;
-                case HeaderName.Gain:
-                    Values.Sort(_headerState == HeaderSortState.Ascending ? GainAscCompare: GainDescCompare);
-                    break;
-                case HeaderName.Performance:
-                    Values.Sort(_headerState == HeaderSortState.Ascending ? PerformanceAscCompare: PerformanceDescCompare);
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
+                HeaderName.None => IDCompare,
+                HeaderName.Fund => FundCompare(_headerState),
+                HeaderName.Quantity => QuantityCompare(_headerState),
+                HeaderName.AverageValue => AverageValueCompare(_headerState),
+                HeaderName.Value => ValueCompare(_headerState),
+                HeaderName.Gain => GainCompare(_headerState),
+                HeaderName.Performance => PerformanceCompare(_headerState),
+                _ => throw new ArgumentException()
+            };
+
+            Values.Sort(comparer);
         }
 
         private void NotifyChange(HeaderName name)
