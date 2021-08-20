@@ -11,8 +11,9 @@ namespace Portfolio.Models
         public readonly string? Comment;
         public readonly int CompanyID;
         public readonly string CompanyName;
+        public readonly string? MorningstarID;
 
-        public Fund(int id = 0, string name = "", int companyId = 0, string companyName = "", string? isin = null, string? yahooCode = null, string? comment = null)
+        public Fund(int id = 0, string name = "", int companyId = 0, string companyName = "", string? morningstarID, string? isin = null, string? yahooCode = null, string? comment = null)
         {
             ID = id;
             Name = name;
@@ -21,6 +22,7 @@ namespace Portfolio.Models
             Comment = comment;
             CompanyID = companyId;
             CompanyName = companyName;
+            MorningstarID = morningstarID;
         }
     }
 }

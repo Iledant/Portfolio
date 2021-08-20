@@ -1,32 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Portfolio.ViewModel
 {
-    public class HistoryDetail
-    {
-        public string EndDate { get; set; }
-        public string Value { get; set; }
-    }
-
-    public class Security
-    {
-        public List<HistoryDetail> HistoryDetail { get; set; }
-        public string Id { get; set; }
-    }
-
-    public class TimeSeries
-    {
-        public List<Security> Security { get; set; }
-    }
-
-    public class MorningStarPayloadRoot
-    {
-        public TimeSeries TimeSeries { get; set; }
-    }
-
     public class PickStockLine
     {
         public string Name;
@@ -51,42 +30,50 @@ namespace Portfolio.ViewModel
             }
         }
 
-        public async void PickStocks(string pattern, DateTime? begin = null, DateTime? end = null)
+        public async void PickStocks(string pattern)
         {
-            string endDate = (end ?? DateTime.Now).ToString("yyyy-MM-dd");
-            string beginDate = (begin ?? new DateTime(1991, 11, 29)).ToString("yyyy-MM-dd");
-            string url = $"https://tools.morningstar.fr/api/rest.svc/timeseries_price/ok91jeenoo?id={pattern}" +
-                $"&currencyId=EUR&idtype=Morningstar&frequency=daily&startDate={beginDate}&endDate={endDate}&outputType=JSON";
+            string url = $"https://www.morningstar.fr/fr/util/SecuritySearch.ashx?" +
+                $"ifIncludeAds=False&q={pattern}&limit=100";
 
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(url);
                 string content = await response.Content.ReadAsStringAsync();
-                string[] lines = content.Split("\n");
-                List<PickStockLine> pickStocks = new();
-                foreach (string line in lines)
-                {
-                    string[] fields = line.Split('|');
-                    if (fields.Length <6)
-                    {
-                        continue;
-                    }
-                    int left = fields[1].IndexOf("\"i\":\"") + 5;
-                    int right = fields[1].IndexOf("\",\"");
-                    if (left == -1 || right == -1 || right <= left)
-                    {
-                        Log.AddLine("Erreur de format dans MonrningStar PickStock sur la ligne : " + line);
-                        continue;
-                    }
-                    pickStocks.Add(new PickStockLine { Name = fields[0], MorningStarID = fields[1].Substring(left, right-left), Category = fields[5], Place = fields[4], Abbreviation = fields[3] });
-                }
-                PickStockLines = pickStocks;
+                ParsePickStocksResponse(content);
             }
             catch (Exception e)
             {
                 Log.AddLine(e.ToString(), LogState.Error);
                 PickStockLines = new List<PickStockLine>();
             }
+        }
+
+        private void ParsePickStocksResponse(string content)
+        {
+            string[] lines = content.Split("\n");
+            List<PickStockLine> pickStocks = new();
+            foreach (string line in lines)
+            {
+                string[] fields = line.Split('|');
+                if (fields.Length < 6)
+                {
+                    continue;
+                }
+                int left = fields[1].IndexOf("\"i\":\"") + 5;
+                int right = fields[1].IndexOf("\",\"");
+                if (left == -1 || right == -1 || right <= left)
+                {
+                    Log.AddLine("Erreur de format dans MonrningStar PickStock sur la ligne : " + line);
+                    continue;
+                }
+                pickStocks.Add(new PickStockLine { 
+                    Name = fields[0], 
+                    MorningStarID = fields[1].Substring(left, right - left), 
+                    Category = fields[5], 
+                    Place = fields[4], 
+                    Abbreviation = fields[3] });
+            }
+            PickStockLines = pickStocks;
         }
     }
 }

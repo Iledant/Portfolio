@@ -1,11 +1,14 @@
 ﻿#nullable enable
 
+using Newtonsoft.Json;
 using Npgsql;
 using Portfolio.Models;
 using Portfolio.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using YahooFinanceApi;
 
@@ -13,10 +16,12 @@ namespace Portfolio.Repositories
 {
     public static class FundRepository
     {
+        private static HttpClient _client = new();
+
         public static List<Fund> Get(string pattern)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT f.id,f.name,f.comment,f.isin,f.yahoo_code,c.id,c.name " +
+            string query = "SELECT f.id,f.name,f.comment,f.isin,f.yahoo_code,c.id,c.name,f.monrningstar_id " +
                 $"FROM fund f " +
                 $"JOIN company c ON f.company_id=c.id " +
                 $"WHERE f.name ILIKE $$%{pattern}%$$ OR f.isin ILIKE $$%{pattern}%$$ " +
@@ -33,7 +38,8 @@ namespace Portfolio.Repositories
                     isin: Repository.ReadNullableString(reader, 3),
                     yahooCode: Repository.ReadNullableString(reader, 4),
                     companyId: reader.GetInt32(5),
-                    companyName: reader.GetString(6)));
+                    companyName: reader.GetString(6),
+                    morningstarID: Repository.ReadNullableString(reader,7)));
             }
             return funds;
         }
@@ -41,7 +47,7 @@ namespace Portfolio.Repositories
         public static List<Fund> GetNotNullYahooCode()
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT f.id,f.name,f.comment,f.isin,f.yahoo_code,c.id,c.name " +
+            string query = "SELECT f.id,f.name,f.comment,f.isin,f.yahoo_code,c.id,c.name,f.morningstar_id " +
                 $"FROM fund f " +
                 $"JOIN company c ON f.company_id=c.id " +
                 $"WHERE yahoo_code IS NOT NULL";
@@ -57,7 +63,8 @@ namespace Portfolio.Repositories
                     isin: Repository.ReadNullableString(reader, 3),
                     yahooCode: Repository.ReadNullableString(reader, 4),
                     companyId: reader.GetInt32(5),
-                    companyName: reader.GetString(6)));
+                    companyName: reader.GetString(6),
+                    morningstarID: Repository.ReadNullableString(reader, 7)));
             }
             return funds;
         }
@@ -65,7 +72,7 @@ namespace Portfolio.Repositories
         public static List<Fund> GetSuggestions(string pattern)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT f.id,f.name,f.comment,f.isin,f.yahoo_code,c.id,c.name " +
+            string query = "SELECT f.id,f.name,f.comment,f.isin,f.yahoo_code,c.id,c.name,f.morningstar_id " +
                 $"FROM fund f " +
                 $"JOIN company c ON f.company_id=c.id " +
                 $"WHERE f.name ILIKE $$%{pattern}%$$ OR f.isin ILIKE $$%{pattern}%$$ " +
@@ -82,7 +89,8 @@ namespace Portfolio.Repositories
                     isin: Repository.ReadNullableString(reader, 3),
                     yahooCode: Repository.ReadNullableString(reader, 4),
                     companyId: reader.GetInt32(5),
-                    companyName: reader.GetString(6)));
+                    companyName: reader.GetString(6),
+                    morningstarID: Repository.ReadNullableString(reader, 7)));
             }
             return funds;
         }
@@ -183,6 +191,67 @@ namespace Portfolio.Repositories
             _ = insertCmd.ExecuteNonQuery();
         }
 
+        public static async Task UpdateHistoricalWithMonrnigstar(Fund fund)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+
+            if (fund.MorningstarID is null)
+            {
+                Log.AddLine("Appel de l'historique Monrnigstar avec unID null");
+                return;
+            }
+
+            List<ParsedHistoryDetail>? historical = await GetMonrningStarHistorical(fund.MorningstarID);
+
+            using NpgsqlCommand? deleteCmd = new("DELETE FROM fund_data_import", con);
+            _ = deleteCmd.ExecuteNonQuery();
+
+            string insertQuery = "INSERT INTO fund_data_import (date,val) " +
+                "SELECT * FROM unnest(@d,@v) AS d";
+            using NpgsqlCommand? importCmd = new(insertQuery, con);
+            _ = importCmd.Parameters.Add(new NpgsqlParameter<DateTime[]>("d",
+                historical.Select(e => e.Date).ToArray()));
+            _ = importCmd.Parameters.Add(new NpgsqlParameter<double[]>("v",
+                historical.Select(e => e.Value).ToArray()));
+            _ = importCmd.ExecuteNonQuery();
+
+            string updateQuery = "INSERT INTO fund_data (fund_id,date,val) " +
+                "SELECT @id,date,val FROM fund_data_import " +
+                "WHERE (@id,date,val) NOT IN " +
+                "  (SELECT fund_id,date,val FROM fund_data)";
+            using NpgsqlCommand? insertCmd = new(updateQuery, con);
+            _ = insertCmd.Parameters.AddWithValue("id", fund.ID);
+            _ = insertCmd.ExecuteNonQuery();
+
+        }
+
+        private static async Task<List<ParsedHistoryDetail>?> GetMonrningStarHistorical(string morningstarID, DateTime? begin = null, DateTime? end = null)
+        {
+            string endDate = (end ?? DateTime.Now).ToString("yyyy-MM-dd");
+            string beginDate = (begin ?? new DateTime(1991, 11, 29)).ToString("yyyy-MM-dd");
+            string url = $"https://tools.morningstar.fr/api/rest.svc/timeseries_price/ok91jeenoo?" +
+                $"id={morningstarID}&currencyId=EUR&idtype=Morningstar&frequency=daily&" +
+                $"startDate={beginDate}&endDate={endDate}&outputType=JSON";
+
+            try
+            {
+                HttpResponseMessage response = await _client.GetAsync(url);
+                string content = await response.Content.ReadAsStringAsync();
+                MorningStarPayloadRoot? root = JsonConvert.DeserializeObject<MorningStarPayloadRoot>(content);
+                if (root is null)
+                {
+                    throw new ArgumentNullException();
+                }
+                
+                return root.TimeSeries.Security[0].HistoryDetail.ConvertAll<ParsedHistoryDetail>(e => new ParsedHistoryDetail(e));
+            }
+            catch (Exception e)
+            {
+                Log.AddLine(e.Message, LogState.Error);
+                return null;
+            }
+        }
+
         public static List<FundData> GetFundDatas(int fundID, DateTime? since = null)
         {
             since ??= DateTime.MinValue;
@@ -231,8 +300,47 @@ namespace Portfolio.Repositories
                 }
                 return (null, DBState.Error);
             }
-            Fund fund = new(id, name, companyID, yahooCode: quote.Symbol);
+            Fund fund = new(id, name, companyID, yahooCode: quote.Symbol, morningstarID: null);
             return (fund, DBState.OK);
         }
+    }
+
+    public class ParsedHistoryDetail
+    {
+        private static NumberFormatInfo _numberFormat = new CultureInfo("en-US").NumberFormat;
+        public readonly DateTime Date;
+        public readonly double Value;
+
+        public ParsedHistoryDetail(HistoryDetail h)
+        {
+            if (h.EndDate.Length < 10)
+            {
+                throw new ArgumentException();
+            }
+            Date = new DateTime(int.Parse(h.EndDate.Substring(0, 4)), int.Parse(h.EndDate.Substring(5, 2)), int.Parse(h.EndDate.Substring(8, 2)));
+            Value = double.Parse(h.Value, _numberFormat);
+        }
+    }
+
+    public class HistoryDetail
+    {
+        public string EndDate { get; set; }
+        public string Value { get; set; }
+    }
+
+    public class Security
+    {
+        public List<HistoryDetail> HistoryDetail { get; set; }
+        public string Id { get; set; }
+    }
+
+    public class TimeSeries
+    {
+        public List<Security> Security { get; set; }
+    }
+
+    public class MorningStarPayloadRoot
+    {
+        public TimeSeries TimeSeries { get; set; }
     }
 }
