@@ -71,9 +71,14 @@ namespace Portfolio.Dialogs
                 averageVal: _averageValue,
                 date: _date,
                 portFolioID: _line.PortFolioID);
-            _ = line.ID == 0 ?
-                PortfolioLineRepository.Insert(line)
-                : PortfolioLineRepository.Update(line);
+            if (line.ID == 0)
+            {
+                PortfolioLineRepository.Insert(line);
+            }
+            else
+            {
+                PortfolioLineRepository.Update(line);
+            }
         }
 
         private void QuantityTextBox_TextChanged(object _1, TextChangedEventArgs _2)
