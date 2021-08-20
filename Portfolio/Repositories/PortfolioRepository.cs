@@ -9,13 +9,13 @@ namespace Portfolio.Repositories
 {
     public class PortFolioLineValue
     {
-        public readonly int FundID;
-        public readonly string FundName;
-        public readonly double FundActualValue;
-        public readonly double Quantity;
-        public readonly double AverageValue;
-        public readonly double Evolution;
-        public readonly double Gain;
+        public int FundID;
+        public string FundName;
+        public double FundActualValue;
+        public double Quantity;
+        public double AverageValue;
+        public double Evolution;
+        public double Gain;
 
         public PortFolioLineValue(int fundID = 0, string fundName = "", double fundActualValue = 0, double quantity = 0, double averageValue = 0)
         {
@@ -24,10 +24,10 @@ namespace Portfolio.Repositories
             FundActualValue = fundActualValue;
             Quantity = quantity;
             AverageValue = averageValue;
-            if (averageValue!= 0) 
-            { 
+            if (averageValue != 0)
+            {
                 Evolution = fundActualValue / averageValue - 1.0;
-            } 
+            }
             else
             {
                 Evolution = 0;
@@ -150,53 +150,53 @@ namespace Portfolio.Repositories
         public static List<PortFolioLineValue> GetActualValue(int portfolioID)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query="SELECT pl.fund_id,fd.date,pl.quantity,fd.value FROM portfolio_line pl " +
+            string query = "SELECT pl.fund_id,fd.date,pl.quantity,fd.value FROM portfolio_line pl " +
                 "JOIN fund_data fd ON pl.fund_id=fd.fund_id " +
                 "WHERE portfolio_id=@portofolio_id ORDER BY 1,2";
-	        List<PortFolioLineValue> fundPerfs = new();
-	        using (NpgsqlCommand? cmd = new(query,con)) { 
-	            cmd.Parameters.AddWithValue("portfolio_id", portfolio_id);
-	            using var reader = cmd.ExcuteQuery();
-	            double cumulativeQuantity, averageValue;
-	            PortFolioLineValue line = new();
-	        
-                while (reader.Read()) 
+            List<PortFolioLineValue> fundPerfs = new();
+            using (NpgsqlCommand? cmd = new(query, con))
+            {
+                cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
+                using NpgsqlDataReader? reader = cmd.ExecuteReader();
+                PortFolioLineValue line = new();
+
+                while (reader.Read())
                 {
-		            int fundId = reader.GetInt32(0);
-		            DateTime date = reader.GetDateTime(1);
-		            double quantity = reader.GetDouble(2);
-		            double value = reader.GetDouble(2);
-		            if (fundId != line.ID) 
+                    int fundId = reader.GetInt32(0);
+                    DateTime date = reader.GetDateTime(1);
+                    double quantity = reader.GetDouble(2);
+                    double value = reader.GetDouble(2);
+                    if (fundId != line.FundID)
                     {
-			            if (line.ID != 0) 
+                        if (line.FundID != 0)
                         {
-				            fundPerfs.Add(line);
-			            }
-			            line = new(id: fundId, quantity: quantity, averageValue: value);
-		            }
-                    else 
+                            fundPerfs.Add(line);
+                        }
+                        line = new(fundID: fundId, quantity: quantity, averageValue: value);
+                    }
+                    else
                     {
-			            if (quantity >0) 
+                        if (quantity > 0)
                         {
-				            line.AverageValue = (quantity*value + line.AverageValue * line.Quantity) / (quantity+line.Quantity);
-			            }
-			            line.Quantity += quantity;
-		            }
-	            }   
-	            if (line.ID != 0) 
+                            line.AverageValue = (quantity * value + line.AverageValue * line.Quantity) / (quantity + line.Quantity);
+                        }
+                        line.Quantity += quantity;
+                    }
+                }
+                if (line.FundID != 0)
                 {
-		            fundPerfs.Add(FundPerf);
-	            }
+                    fundPerfs.Add(line);
+                }
             }
 
-            string fetchNameAndValuesQuery = "SELECT f.id,f.name,av.value FROM fund f "+
+            string fetchNameAndValuesQuery = "SELECT f.id,f.name,av.value FROM fund f " +
                 "JOIN portfolioline pf ON pf.fund_id=f.id " +
                 "JOIN (SELECT fund_id,value,max(date) FROM fund_data GROUP BY 1,2) av ON av.fund_id=f.id " +
                 "WHERE pf.id=@portfolio_id ORDER BY 1";
-            using (NgpsqlCommand? cmd=new(fetchNameAndValuesQuery, con))
+            using (NpgsqlCommand? cmd = new(fetchNameAndValuesQuery, con))
             {
                 cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
-                using var reader = cmd.ExecuteQuery();
+                using var reader = cmd.ExecuteReader();
                 int i = 0;
                 while (reader.Read())
                 {
@@ -211,7 +211,7 @@ namespace Portfolio.Repositories
                     }
                     else
                     {
-                        throw new ArgumentException();
+                        throw new ArgumentOutOfRangeException();
                     }
                     i++;
                 }
