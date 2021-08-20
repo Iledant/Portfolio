@@ -221,7 +221,7 @@ namespace Portfolio.Pages
                 AddCell(ViewModel.Values[i].FundName, TextAlignment.Left, 0, i + 1);
                 AddCell(ViewModel.Values[i].Quantity.ToString("N2", _ci), TextAlignment.Right, 1, i + 1);
                 AddCell(ViewModel.Values[i].AverageValue.ToString("C", _ci), TextAlignment.Right, 2, i + 1);
-                AddCell(ViewModel.Values[i].FundActualValue.ToString("C", _ci), TextAlignment.Right, 3, i + 1);
+                AddCell(ViewModel.Values[i].ActualValue.ToString("C", _ci), TextAlignment.Right, 3, i + 1);
                 AddCell(ViewModel.Values[i].Gain.ToString("C", _ci), TextAlignment.Right, 4, i + 1);
                 AddCell(ViewModel.Values[i].Evolution.ToString("P", _ci), TextAlignment.Right, 5, i + 1);
             }
@@ -269,7 +269,7 @@ namespace Portfolio.Pages
                 textblock.Text = ViewModel.Values[i].AverageValue.ToString("C", _ci);
                 border = Table.Children[_cellBeginIndex + i * 6 + 3] as Border;
                 textblock = border.Child as TextBlock;
-                textblock.Text = ViewModel.Values[i].FundActualValue.ToString("C", _ci);
+                textblock.Text = ViewModel.Values[i].ActualValue.ToString("C", _ci);
                 border = Table.Children[_cellBeginIndex + i * 6 + 4] as Border;
                 textblock = border.Child as TextBlock;
                 textblock.Text = ViewModel.Values[i].Gain.ToString("C", _ci);

@@ -11,28 +11,28 @@ namespace Portfolio.Repositories
     {
         public int FundID;
         public string FundName;
-        public double FundActualValue;
+        public double ActualValue;
         public double Quantity;
         public double AverageValue;
         public double Evolution;
         public double Gain;
 
-        public PortFolioLineValue(int fundID = 0, string fundName = "", double fundActualValue = 0, double quantity = 0, double averageValue = 0)
+        public PortFolioLineValue(int fundID = 0, string fundName = "", double actualValue = 0, double quantity = 0, double averageValue = 0)
         {
             FundID = fundID;
             FundName = fundName;
-            FundActualValue = fundActualValue;
+            ActualValue = actualValue;
             Quantity = quantity;
             AverageValue = averageValue;
             if (averageValue != 0)
             {
-                Evolution = fundActualValue / averageValue - 1.0;
+                Evolution = actualValue / averageValue - 1.0;
             }
             else
             {
                 Evolution = 0;
             }
-            Gain = (FundActualValue - AverageValue) * Quantity;
+            Gain = (ActualValue - AverageValue) * Quantity;
         }
     }
 
@@ -150,11 +150,12 @@ namespace Portfolio.Repositories
         public static List<PortFolioLineValue> GetActualValue(int portfolioID)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT pl.fund_id,fd.date,pl.quantity,fd.value FROM portfolio_line pl " +
+            List<PortFolioLineValue> fundPerfs = new();
+            
+            string historicalQuery = "SELECT pl.fund_id,fd.date,pl.quantity,fd.value FROM portfolio_line pl " +
                 "JOIN fund_data fd ON pl.fund_id=fd.fund_id " +
                 "WHERE portfolio_id=@portofolio_id ORDER BY 1,2";
-            List<PortFolioLineValue> fundPerfs = new();
-            using (NpgsqlCommand? cmd = new(query, con))
+            using (NpgsqlCommand? cmd = new(historicalQuery, con))
             {
                 cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
                 using NpgsqlDataReader? reader = cmd.ExecuteReader();
@@ -189,11 +190,11 @@ namespace Portfolio.Repositories
                 }
             }
 
-            string fetchNameAndValuesQuery = "SELECT f.id,f.name,av.value FROM fund f " +
+            string nameAndActualValueQuery = "SELECT f.id,f.name,av.value FROM fund f " +
                 "JOIN portfolioline pf ON pf.fund_id=f.id " +
                 "JOIN (SELECT fund_id,value,max(date) FROM fund_data GROUP BY 1,2) av ON av.fund_id=f.id " +
                 "WHERE pf.id=@portfolio_id ORDER BY 1";
-            using (NpgsqlCommand? cmd = new(fetchNameAndValuesQuery, con))
+            using (NpgsqlCommand? cmd = new(nameAndActualValueQuery, con))
             {
                 cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
                 using var reader = cmd.ExecuteReader();
@@ -205,9 +206,9 @@ namespace Portfolio.Repositories
                     if (line.FundID == fundId)
                     {
                         line.FundName = reader.GetString(1);
-                        line.FundActualValue = reader.GetDouble(2);
-                        line.Gain = line.Quantity * (line.FundActualValue - line.AverageValue);
-                        line.Evolution = line.FundActualValue / line.AverageValue - 1;
+                        line.ActualValue = reader.GetDouble(2);
+                        line.Gain = line.Quantity * (line.ActualValue - line.AverageValue);
+                        line.Evolution = line.ActualValue / line.AverageValue - 1;
                     }
                     else
                     {

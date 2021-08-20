@@ -33,7 +33,7 @@ namespace Portfolio.ViewModel
             foreach (PortFolioLineValue line in Values)
             {
                 _totalInitialValue += line.AverageValue * line.Quantity;
-                _totalActualValue += line.FundActualValue * line.Quantity;
+                _totalActualValue += line.ActualValue * line.Quantity;
             }
             _totalGain = _totalActualValue - _totalInitialValue;
             _totalPerformance = _totalGain / _totalInitialValue;
@@ -88,7 +88,7 @@ namespace Portfolio.ViewModel
         private static Comparison<PortFolioLineValue> ValueCompare(HeaderSortState s)
         {
             int sign = s == HeaderSortState.Ascending ? 1 : -1;
-            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.FundActualValue.CompareTo(b.FundActualValue);
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.ActualValue.CompareTo(b.ActualValue);
         }
 
         private static Comparison<PortFolioLineValue> GainCompare(HeaderSortState s)
