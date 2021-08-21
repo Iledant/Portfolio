@@ -39,7 +39,7 @@ namespace Portfolio.Repositories
                     yahooCode: Repository.ReadNullableString(reader, 4),
                     companyId: reader.GetInt32(5),
                     companyName: reader.GetString(6),
-                    morningstarID: Repository.ReadNullableString(reader,7)));
+                    morningstarID: Repository.ReadNullableString(reader, 7)));
             }
             return funds;
         }
@@ -196,41 +196,52 @@ namespace Portfolio.Repositories
             _ = insertCmd.ExecuteNonQuery();
         }
 
-        public static async Task UpdateHistoricalWithMonrnigstar(Fund fund)
+        private static List<Fund> GetNotNullMorningstarID(NpgsqlConnection? con)
         {
-            NpgsqlConnection? con = DB.GetConnection();
-
-            if (fund.MorningstarID is null)
+            string query = "SELECT f.id,f.morningstar_id FROM fund f " +
+                "WHERE morningstar_id IS NOT NULL";
+            using NpgsqlCommand? cmd = new(query, con);
+            List<Fund> funds = new();
+            using NpgsqlDataReader? reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                Log.AddLine("Appel de l'historique Monrnigstar avec unID null");
-                return;
+                funds.Add(new(id: reader.GetInt32(0), morningstarID: reader.GetString(1)));
             }
-
-            List<ParsedHistoryDetail>? historical = await GetMonrningStarHistorical(fund.MorningstarID);
-
-            using NpgsqlCommand? deleteCmd = new("DELETE FROM fund_data_import", con);
-            _ = deleteCmd.ExecuteNonQuery();
-
-            string insertQuery = "INSERT INTO fund_data_import (date,val) " +
-                "SELECT * FROM unnest(@d,@v) AS d";
-            using NpgsqlCommand? importCmd = new(insertQuery, con);
-            _ = importCmd.Parameters.Add(new NpgsqlParameter<DateTime[]>("d",
-                historical.Select(e => e.Date).ToArray()));
-            _ = importCmd.Parameters.Add(new NpgsqlParameter<double[]>("v",
-                historical.Select(e => e.Value).ToArray()));
-            _ = importCmd.ExecuteNonQuery();
-
-            string updateQuery = "INSERT INTO fund_data (fund_id,date,val) " +
-                "SELECT @id,date,val FROM fund_data_import " +
-                "WHERE (@id,date,val) NOT IN " +
-                "  (SELECT fund_id,date,val FROM fund_data)";
-            using NpgsqlCommand? insertCmd = new(updateQuery, con);
-            _ = insertCmd.Parameters.AddWithValue("id", fund.ID);
-            _ = insertCmd.ExecuteNonQuery();
-
+            return funds;
         }
 
-        private static async Task<List<ParsedHistoryDetail>?> GetMonrningStarHistorical(string morningstarID, DateTime? begin = null, DateTime? end = null)
+        public static async Task UpdateMorningstarHistorical()
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            List<Fund> funds = GetNotNullMorningstarID(con);
+
+            foreach (Fund fund in funds)
+            {
+                List<ParsedHistoryDetail>? historical = await GetMorningStarHistorical(fund.MorningstarID);
+
+                using NpgsqlCommand? deleteCmd = new("DELETE FROM fund_data_import", con);
+                _ = deleteCmd.ExecuteNonQuery();
+
+                string insertQuery = "INSERT INTO fund_data_import (date,val) " +
+                    "SELECT * FROM unnest(@d,@v) AS d";
+                using NpgsqlCommand? importCmd = new(insertQuery, con);
+                _ = importCmd.Parameters.Add(new NpgsqlParameter<DateTime[]>("d",
+                    historical.Select(e => e.Date).ToArray()));
+                _ = importCmd.Parameters.Add(new NpgsqlParameter<double[]>("v",
+                    historical.Select(e => e.Value).ToArray()));
+                _ = importCmd.ExecuteNonQuery();
+
+                string updateQuery = "INSERT INTO fund_data (fund_id,date,val) " +
+                    "SELECT @id,date,val FROM fund_data_import " +
+                    "WHERE (@id,date,val) NOT IN " +
+                    "  (SELECT fund_id,date,val FROM fund_data)";
+                using NpgsqlCommand? insertCmd = new(updateQuery, con);
+                _ = insertCmd.Parameters.AddWithValue("id", fund.ID);
+                _ = insertCmd.ExecuteNonQuery();
+            }
+        }
+
+        private static async Task<List<ParsedHistoryDetail>?> GetMorningStarHistorical(string morningstarID, DateTime? begin = null, DateTime? end = null)
         {
             string endDate = (end ?? DateTime.Now).ToString("yyyy-MM-dd");
             string beginDate = (begin ?? new DateTime(1991, 11, 29)).ToString("yyyy-MM-dd");
@@ -247,7 +258,7 @@ namespace Portfolio.Repositories
                 {
                     throw new ArgumentNullException();
                 }
-                
+
                 return root.TimeSeries.Security[0].HistoryDetail.ConvertAll<ParsedHistoryDetail>(e => new ParsedHistoryDetail(e));
             }
             catch (Exception e)
@@ -322,7 +333,9 @@ namespace Portfolio.Repositories
             {
                 throw new ArgumentException();
             }
-            Date = new DateTime(int.Parse(h.EndDate.Substring(0, 4)), int.Parse(h.EndDate.Substring(5, 2)), int.Parse(h.EndDate.Substring(8, 2)));
+            Date = new DateTime(int.Parse(h.EndDate.Substring(0, 4)),
+                int.Parse(h.EndDate.Substring(5, 2)),
+                int.Parse(h.EndDate.Substring(8, 2)));
             Value = double.Parse(h.Value, _numberFormat);
         }
     }
