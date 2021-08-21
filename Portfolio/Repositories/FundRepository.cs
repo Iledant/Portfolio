@@ -98,7 +98,8 @@ namespace Portfolio.Repositories
         public static void Insert(Fund fund)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "INSERT INTO fund (name,comment,isin,yahoo_code,company_id) VALUES(@name,@comment,@isin,@yahoo_code,@company_id);";
+            string query = "INSERT INTO fund (name,comment,isin,yahoo_code,morningstar_id,company_id) " +
+                "VALUES(@name,@comment,@isin,@yahoo_code,@morningstar_id,@company_id);";
             using NpgsqlCommand? cmd = new(query, con);
             _ = cmd.Parameters.AddWithValue("name", fund.Name);
             _ = cmd.Parameters.AddWithValue("comment",
@@ -107,6 +108,8 @@ namespace Portfolio.Repositories
                 Repository.ConvertNullableStringParam(fund.ISIN));
             _ = cmd.Parameters.AddWithValue("yahoo_code",
                 Repository.ConvertNullableStringParam(fund.YahooCode));
+            _ = cmd.Parameters.AddWithValue("morningstar_id",
+                Repository.ConvertNullableStringParam(fund.MorningstarID));
             _ = cmd.Parameters.AddWithValue("company_id", fund.CompanyID);
             try
             {
@@ -127,7 +130,7 @@ namespace Portfolio.Repositories
         {
             NpgsqlConnection? con = DB.GetConnection();
             string query = "UPDATE fund SET name=@name,comment=@comment,isin=@isin," +
-                "yahoo_code=@yahoo_code,company_id=@company_id WHERE id=@id;";
+                "yahoo_code=@yahoo_code,company_id=@company_id,morningstar_id=@morningstar_id WHERE id=@id;";
             using NpgsqlCommand? cmd = new(query, con);
             _ = cmd.Parameters.AddWithValue("name", fund.Name);
             _ = cmd.Parameters.AddWithValue("comment",
@@ -136,6 +139,8 @@ namespace Portfolio.Repositories
                 Repository.ConvertNullableStringParam(fund.ISIN));
             _ = cmd.Parameters.AddWithValue("yahoo_code",
                 Repository.ConvertNullableStringParam(fund.YahooCode));
+            _ = cmd.Parameters.AddWithValue("morningstar_id",
+                Repository.ConvertNullableStringParam(fund.MorningstarID));
             _ = cmd.Parameters.AddWithValue("company_id", fund.CompanyID);
             _ = cmd.Parameters.AddWithValue("id", fund.ID);
             try

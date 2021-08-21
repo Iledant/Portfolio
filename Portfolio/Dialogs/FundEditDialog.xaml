@@ -25,6 +25,7 @@
         </ComboBox>
         <TextBox x:Name="ISINTextBox" Header="Code ISIN" TextChanged="ISINTextBox_TextChanged" />
         <TextBox x:Name="YahooCodeTextBox" Header="Code Yahoo" TextChanged="YahooCodeTextBox_TextChanged" />
+        <TextBox x:Name="MornigstarIDTextBox" Header="ID Morningstar" TextChanged="MornigstarIDTextBox_TextChanged" />
         <TextBox x:Name="CommentTextBox" Header="Commentaire" />
     </StackPanel>
 </ContentDialog>

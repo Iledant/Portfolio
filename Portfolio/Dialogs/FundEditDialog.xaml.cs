@@ -28,6 +28,7 @@ namespace Portfolio.Dialogs
                 YahooCodeTextBox.Text = "";
                 CommentTextBox.Text = "";
                 PrimaryButtonText = "Créer";
+                MornigstarIDTextBox.Text = "";
                 Title = "Ajouter un fond";
                 IsPrimaryButtonEnabled = false;
                 _companyID = 0;
@@ -47,6 +48,7 @@ namespace Portfolio.Dialogs
                 ISINTextBox.Text = fund.ISIN ?? "";
                 YahooCodeTextBox.Text = fund.YahooCode ?? "";
                 CommentTextBox.Text = fund.Comment ?? "";
+                MornigstarIDTextBox.Text = fund.MorningstarID ?? "";
                 PrimaryButtonText = "Modifer";
                 Title = "Modifier un fond";
                 IsPrimaryButtonEnabled = true;
@@ -58,7 +60,14 @@ namespace Portfolio.Dialogs
             string comment = CommentTextBox.Text == "" ? null : CommentTextBox.Text;
             string yahooCode = YahooCodeTextBox.Text == "" ? null : YahooCodeTextBox.Text;
             string isinCode = ISINTextBox.Text == "" ? null : ISINTextBox.Text;
-            Fund fund = new(id: _fund.ID,companyId: _companyID, name: NameTextBox.Text, isin: isinCode, yahooCode: yahooCode, comment: comment);
+            string morningStarID = MornigstarIDTextBox.Text == "" ? null : MornigstarIDTextBox.Text;
+            Fund fund = new(id: _fund.ID,
+                companyId: _companyID,
+                name: NameTextBox.Text,
+                isin: isinCode,
+                yahooCode: yahooCode,
+                morningstarID: morningStarID,
+                comment: comment);
             if (_fund.ID == 0)
             {
                 FundRepository.Insert(fund);
@@ -82,7 +91,9 @@ namespace Portfolio.Dialogs
 
         private void CheckFields()
         {
-            IsPrimaryButtonEnabled = NameTextBox.Text != "" && _companyID != 0 && (ISINTextBox.Text != "" || YahooCodeTextBox.Text != "");
+            IsPrimaryButtonEnabled = NameTextBox.Text != ""
+                && _companyID != 0
+                && (ISINTextBox.Text != "" || YahooCodeTextBox.Text != "" || MornigstarIDTextBox.Text != "");
         }
 
         private void ISINTextBox_TextChanged(object _1, TextChangedEventArgs _2)
@@ -90,7 +101,12 @@ namespace Portfolio.Dialogs
             CheckFields();
         }
 
-        private void YahooCodeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void YahooCodeTextBox_TextChanged(object _1, TextChangedEventArgs _2)
+        {
+            CheckFields();
+        }
+
+        private void MornigstarIDTextBox_TextChanged(object _1, TextChangedEventArgs _2)
         {
             CheckFields();
         }

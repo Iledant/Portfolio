@@ -66,11 +66,12 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Rectangle Grid.Column="0" Width="6" Fill="GreenYellow" />
-                            <StackPanel Orientation="Vertical" Spacing="6" Padding="12" Grid.Column="1">
+                            <StackPanel Orientation="Vertical" Padding="12" Grid.Column="1">
                                 <TextBlock Text="{x:Bind local2:Converters.LabelNullableString('Nom', Name)}" />
                                 <TextBlock Text="{x:Bind local2:Converters.LabelNullableString('Compagnie', CompanyName)}" />
                                 <TextBlock Text="{x:Bind local2:Converters.LabelNullableString('ISIN', ISIN)}" />
                                 <TextBlock Text="{x:Bind local2:Converters.LabelNullableString('Code Yahoo', YahooCode)}" />
+                                <TextBlock Text="{x:Bind local2:Converters.LabelNullableString('ID Morningstar', MorningstarID)}" />
                             </StackPanel>
                         </Grid>
                         <UserControl.ContextFlyout>
