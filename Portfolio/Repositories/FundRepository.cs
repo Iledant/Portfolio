@@ -16,12 +16,12 @@ namespace Portfolio.Repositories
 {
     public static class FundRepository
     {
-        private static HttpClient _client = new();
+        private readonly static HttpClient _client = new();
 
         public static List<Fund> Get(string pattern)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT f.id,f.name,f.comment,f.isin,f.yahoo_code,c.id,c.name,f.monrningstar_id " +
+            string query = "SELECT f.id,f.name,f.comment,f.isin,f.yahoo_code,c.id,c.name,f.morningstar_id " +
                 $"FROM fund f " +
                 $"JOIN company c ON f.company_id=c.id " +
                 $"WHERE f.name ILIKE $$%{pattern}%$$ OR f.isin ILIKE $$%{pattern}%$$ " +
@@ -307,7 +307,7 @@ namespace Portfolio.Repositories
 
     public class ParsedHistoryDetail
     {
-        private static NumberFormatInfo _numberFormat = new CultureInfo("en-US").NumberFormat;
+        private readonly static NumberFormatInfo _numberFormat = new CultureInfo("en-US").NumberFormat;
         public readonly DateTime Date;
         public readonly double Value;
 
