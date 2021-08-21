@@ -15,8 +15,9 @@
     <StackPanel Padding="12" Spacing="6">
         <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,20">
             <Rectangle Width="6" Fill="YellowGreen"/>
-            <TextBlock Text="Recherche de fonds sur Yahoo finances" Style="{ThemeResource SubtitleTextBlockStyle}" />
+            <TextBlock Text="Recherche de fonds" Style="{ThemeResource TitleTextBlockStyle}" />
         </StackPanel>
+        <TextBlock Text="Sur Yahoo Finances"  Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
         <Grid ColumnSpacing="6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -93,5 +94,47 @@
                 Text="Le fond a été ajouté à la base, récupération de l'historique" Foreground="Green" VerticalAlignment="Center"/>
             </StackPanel>
         </StackPanel>
+
+        <TextBlock Text="Sur Morningstar" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,12,0,12"/>
+        <Grid ColumnSpacing="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Header="Nom du fond" x:Name="MorningstarSearch" />
+            <Button 
+                x:Name="MorningstarSearchButton"
+                Click="MorningstarSearchButton_Click" 
+                Grid.Column="1"
+                VerticalAlignment="Bottom">
+                Chercher</Button>
+        </Grid>
+        <GridView 
+            x:Name="MornigstarStocksList"
+            ItemsSource="{x:Bind ViewModel.MorningstarResponses, Mode=OneWay}"
+            Margin="0,20,0,0">
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local1:MorningstarResponseLine">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Rectangle Grid.Column="0" Width="6" Fill="GreenYellow" />
+                        <Grid RowSpacing="6" Padding="12,12,12,0" Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="{x:Bind sys:String.Format('Nom : {0}', Name)}" />
+                            <TextBlock Grid.Row="1" Text="{x:Bind sys:String.Format('ID Mornigstar : {0}', MorningStarID)}" />
+                            <TextBlock Grid.Row="2" Text="{x:Bind sys:String.Format('Type : {0}', Category)}" />
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+            
+        </GridView>
     </StackPanel>
 </Page>

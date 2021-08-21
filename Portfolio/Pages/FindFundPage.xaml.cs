@@ -13,7 +13,7 @@ namespace Portfolio.Pages
     /// </summary>
     public sealed partial class FindFundPage : Page
     {
-        private readonly YahooFinanceViewModel ViewModel;
+        private readonly APIFinanceViewModel ViewModel;
         private int _companyID = 0;
 
         public FindFundPage()
@@ -73,6 +73,14 @@ namespace Portfolio.Pages
         {
             ErrorStackPanel.Visibility = Visibility.Collapsed;
             OkStackPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void MorningstarSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (MorningstarSearch.Text != "")
+            {
+                ViewModel.MorningstarSearch(MorningstarSearch.Text);
+            }
         }
     }
 }
