@@ -3,7 +3,6 @@ using Portfolio.Models;
 using Portfolio.Repositories;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using YahooFinanceApi;
 
@@ -43,14 +42,24 @@ namespace Portfolio.ViewModel
         public int TimeTakenForScreenerField { get; set; }
     }
 
-    public class YahooFinanceViewModel : Bindable
+    public class MorningstarResponseLine
+    {
+        public string Name;
+        public string MorningStarID;
+        public string Category;
+        public string Place;
+        public string Abbreviation;
+    }
+
+    public class APIFinanceViewModel : Bindable
     {
         private IReadOnlyList<Candle> _history;
         private string _errorMessage;
         private List<Fund> _funds;
-        private static readonly HttpClient client = new();
+        private static readonly HttpClient _client = new();
         private List<Quote> _quotes;
         private List<Company> _companies;
+        private List<MorningstarResponseLine> _morningstarResponses;
 
         public IReadOnlyList<Candle> History
         {
@@ -69,6 +78,16 @@ namespace Portfolio.ViewModel
             {
                 _funds = value;
                 OnPropertyChanged(nameof(Funds));
+            }
+        }
+
+        public List<MorningstarResponseLine> MorningstarResponses
+        {
+            get => _morningstarResponses;
+            set
+            {
+                _morningstarResponses = value;
+                OnPropertyChanged(nameof(MorningstarResponses));
             }
         }
 
@@ -128,14 +147,14 @@ namespace Portfolio.ViewModel
 
             try
             {
-                HttpResponseMessage response = await client.GetAsync(url);
+                HttpResponseMessage response = await _client.GetAsync(url);
                 string content = await response.Content.ReadAsStringAsync();
                 Root root = JsonConvert.DeserializeObject<Root>(content);
                 Quotes = root?.Quotes;
             }
             catch (Exception e)
             {
-                Log.AddLine(e.ToString(),LogState.Error);
+                Log.AddLine(e.ToString(), LogState.Error);
             }
         }
 
@@ -147,6 +166,54 @@ namespace Portfolio.ViewModel
         public void GetCompanies()
         {
             Companies = CompanyRepository.Get("");
+        }
+
+        public async void MorningstarSearch(string pattern)
+        {
+            string url = $"https://www.morningstar.fr/fr/util/SecuritySearch.ashx?" +
+                $"ifIncludeAds=False&q={pattern}&limit=100";
+
+            try
+            {
+                HttpResponseMessage response = await _client.GetAsync(url);
+                string content = await response.Content.ReadAsStringAsync();
+                ParseMorningstarResponse(content);
+            }
+            catch (Exception e)
+            {
+                Log.AddLine(e.ToString(), LogState.Error);
+                MorningstarResponses = new List<MorningstarResponseLine>();
+            }
+        }
+
+        private void ParseMorningstarResponse(string content)
+        {
+            string[] lines = content.Split("\n");
+            List<MorningstarResponseLine> pickStocks = new();
+            foreach (string line in lines)
+            {
+                string[] fields = line.Split('|');
+                if (fields.Length < 6)
+                {
+                    continue;
+                }
+                int left = fields[1].IndexOf("\"i\":\"") + 5;
+                int right = fields[1].IndexOf("\",\"");
+                if (left == -1 || right == -1 || right <= left)
+                {
+                    Log.AddLine("Erreur de format dans MonrningStar PickStock sur la ligne : " + line);
+                    continue;
+                }
+                pickStocks.Add(new MorningstarResponseLine
+                {
+                    Name = fields[0],
+                    MorningStarID = fields[1].Substring(left, right - left),
+                    Category = fields[5],
+                    Place = fields[4],
+                    Abbreviation = fields[3]
+                });
+            }
+            MorningstarResponses = pickStocks;
         }
     }
 }
