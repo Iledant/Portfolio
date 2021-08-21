@@ -152,12 +152,14 @@ namespace Portfolio.Repositories
             NpgsqlConnection? con = DB.GetConnection();
             List<PortFolioLineValue> fundPerfs = new();
             
-            string historicalQuery = "SELECT pl.fund_id,fd.date,pl.quantity,fd.value FROM portfolio_line pl " +
+            // Il faut reprendre la structure de la table pour imposer une date non nulle dans portfolio_line à utiliser dans la requête ci-dessous et non pas les dates de valeurs historiques du fond
+
+            string historicalQuery = "SELECT pl.fund_id,fd.date,pl.quantity,fd.val FROM portfolio_line pl " +
                 "JOIN fund_data fd ON pl.fund_id=fd.fund_id " +
-                "WHERE portfolio_id=@portofolio_id ORDER BY 1,2";
+                "WHERE pl.id=@portfolio_id ORDER BY 1,2";
             using (NpgsqlCommand? cmd = new(historicalQuery, con))
             {
-                cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
+                _ = cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
                 using NpgsqlDataReader? reader = cmd.ExecuteReader();
                 PortFolioLineValue line = new();
 
@@ -190,9 +192,9 @@ namespace Portfolio.Repositories
                 }
             }
 
-            string nameAndActualValueQuery = "SELECT f.id,f.name,av.value FROM fund f " +
-                "JOIN portfolioline pf ON pf.fund_id=f.id " +
-                "JOIN (SELECT fund_id,value,max(date) FROM fund_data GROUP BY 1,2) av ON av.fund_id=f.id " +
+            string nameAndActualValueQuery = "SELECT f.id,f.name,av.val FROM fund f " +
+                "JOIN portfolio_line pf ON pf.fund_id=f.id " +
+                "JOIN (SELECT fund_id,val,max(date) FROM fund_data GROUP BY 1,2) av ON av.fund_id=f.id " +
                 "WHERE pf.id=@portfolio_id ORDER BY 1";
             using (NpgsqlCommand? cmd = new(nameAndActualValueQuery, con))
             {
