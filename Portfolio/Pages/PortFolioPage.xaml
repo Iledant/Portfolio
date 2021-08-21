@@ -69,12 +69,12 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Rectangle Fill="YellowGreen" Grid.Column="0" Width="6"/>
-                            <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="6" Padding="12">
+                            <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="3" Padding="12">
                                 <TextBlock Text="{x:Bind sys:String.Format('Fond : {0}', FundName)}" />
                                 <TextBlock Text="{x:Bind sys:String.Format('Compagnie : {0}', CompanyName)}" />
                                 <TextBlock Text="{x:Bind sys:String.Format('Quantité : {0:g}', Quantity)}" />
                                 <TextBlock Text="{x:Bind local2:Bindable.NullDateTimeDisplay('Date d^&apos;achat : ', Date)}" />
-                                <TextBlock Text="{x:Bind local2:Bindable.NullDoubleDisplay('Prix moyen d^&apos;achat : ',AverageVal )}" />
+                                <TextBlock Text="{x:Bind local2:Bindable.NullDoubleDisplay('Prix d^&apos;achat : ', PurchaseVal)}" />
                             </StackPanel>
                         </Grid>
 

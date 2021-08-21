@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using Windows.UI.Xaml.Controls;
 
-// Pour plus d'informations sur le modèle d'élément Boîte de dialogue de contenu, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace Portfolio.Dialogs
 {
     public sealed partial class PortFolioLineEditDialog : ContentDialog
@@ -13,7 +11,7 @@ namespace Portfolio.Dialogs
         private readonly List<Fund> _funds;
         private readonly PortFolioLine _line;
         private double? _quantity;
-        private double? _averageValue;
+        private double? _purchaseValue;
         private DateTime? _date;
 
         #region constructor
@@ -31,7 +29,7 @@ namespace Portfolio.Dialogs
             if (_line.ID == 0)
             {
                 _quantity = null;
-                _averageValue = null;
+                _purchaseValue = null;
                 _date = null;
                 FundComboBox.SelectedItem = null;
                 QuantityTextBox.Text = "";
@@ -51,9 +49,9 @@ namespace Portfolio.Dialogs
                 }
                 _date = _line.Date;
                 _quantity = _line.Quantity;
-                _averageValue = _line.AverageVal;
+                _purchaseValue = _line.PurchaseVal;
                 QuantityTextBox.Text = _line.Quantity.ToString();
-                AveragePriceTextBox.Text = (_line.AverageVal is not null) ? _line.AverageVal.ToString() : "";
+                AveragePriceTextBox.Text = _line.PurchaseVal.ToString();
                 PrimaryButtonText = "Modifier";
                 Title = "Modifier la ligne";
             }
@@ -67,8 +65,8 @@ namespace Portfolio.Dialogs
             Fund fund = FundComboBox.SelectedItem as Fund;
             PortFolioLine line = new(id: _line.ID,
                 fundId: fund.ID,
-                quantity: _quantity ?? 1.0,
-                averageVal: _averageValue,
+                quantity: (double)_quantity,
+                purchaseVal: _purchaseValue,
                 date: _date,
                 portFolioID: _line.PortFolioID);
             if (line.ID == 0)
@@ -109,11 +107,11 @@ namespace Portfolio.Dialogs
         {
             try
             {
-                _averageValue = double.Parse(AveragePriceTextBox.Text);
+                _purchaseValue = double.Parse(AveragePriceTextBox.Text);
             }
             catch
             {
-                _averageValue = null;
+                _purchaseValue = null;
             }
             CheckValues();
         }
@@ -123,7 +121,10 @@ namespace Portfolio.Dialogs
 
         private void CheckValues()
         {
-            IsPrimaryButtonEnabled = _quantity is not null && (_date is not null || _averageValue is not null) && FundComboBox.SelectedItem is not null;
+            IsPrimaryButtonEnabled = _quantity is not null
+                && _date is not null
+                && _purchaseValue is not null
+                && FundComboBox.SelectedItem is not null;
         }
         #endregion
     }

@@ -11,7 +11,11 @@
     SecondaryButtonText="Annuler"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
     <StackPanel Orientation="Vertical">
-        <ComboBox x:Name="FundComboBox" Header="Nom du fond" HorizontalAlignment="Stretch" SelectionChanged="FundComboBox_SelectionChanged">
+        <ComboBox 
+            x:Name="FundComboBox" 
+            Header="Nom du fond" 
+            HorizontalAlignment="Stretch" 
+            SelectionChanged="FundComboBox_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="local1:Fund">
                     <TextBlock Text="{x:Bind Name}" />
@@ -20,6 +24,6 @@
         </ComboBox>
         <TextBox Header="Quantité" x:Name="QuantityTextBox" TextChanged="QuantityTextBox_TextChanged" />
         <DatePicker x:Name="DatePicker" Header="Date d'achat" DateChanged="DatePicker_DateChanged"/>
-        <TextBox  x:Name="AveragePriceTextBox" Header ="Prix moyen d'achat" TextChanged="AveragePriceTextBox_TextChanged"/>
+        <TextBox  x:Name="AveragePriceTextBox" Header ="Prix d'achat" TextChanged="AveragePriceTextBox_TextChanged"/>
     </StackPanel>
 </ContentDialog>

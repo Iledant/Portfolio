@@ -12,7 +12,7 @@ namespace Portfolio.Repositories
         public static List<PortFolioLine> Get(string pattern)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.average_val,l.portfolio_id,c.id,c.name " +
+            string query = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.purchase_val,l.portfolio_id,c.id,c.name " +
                 "FROM portfolio_line l " +
                 "JOIN fund f ON l.fund_id=f.id " +
                 "JOIN company c ON f.company_id=c.id " +
@@ -32,7 +32,7 @@ namespace Portfolio.Repositories
                         fundId: reader.GetInt32(2),
                         fundName: reader.GetString(3),
                         quantity: reader.GetDouble(4),
-                        averageVal: reader.IsDBNull(5) ? null : reader.GetDouble(5),
+                        purchaseVal: reader.IsDBNull(5) ? null : reader.GetDouble(5),
                         companyID: reader.GetInt32(7),
                         companyName: reader.GetString(8))
                     );
@@ -43,7 +43,7 @@ namespace Portfolio.Repositories
         public static List<PortFolioLine> GetFromPortFolio(PortFolio portfolio, string pattern)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.average_val,l.portfolio_id,c.id,c.name " +
+            string query = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.purchase_val,l.portfolio_id,c.id,c.name " +
                 "FROM portfolio_line l " +
                 "JOIN fund f ON l.fund_id=f.id " +
                 "JOIN company c ON f.company_id=c.id " +
@@ -65,7 +65,7 @@ namespace Portfolio.Repositories
                         fundId: reader.GetInt32(2),
                         fundName: reader.GetString(3),
                         quantity: reader.GetDouble(4),
-                        averageVal: reader.IsDBNull(5) ? null : reader.GetDouble(5),
+                        purchaseVal: reader.IsDBNull(5) ? null : reader.GetDouble(5),
                         companyID: reader.GetInt32(7),
                         companyName: reader.GetString(8))
                     );
@@ -109,13 +109,13 @@ namespace Portfolio.Repositories
                 return;
             }
 
-            string insertQuery = $"INSERT INTO portfolio_line (date,fund_id,quantity,average_val) " +
-                $"VALUES(@date,@fund_id,@quantity,@average_val);";
+            string insertQuery = $"INSERT INTO portfolio_line (date,fund_id,quantity,purchase_val) " +
+                $"VALUES(@date,@fund_id,@quantity,@purchase_val);";
             using NpgsqlCommand? cmd = new(insertQuery, con);
-            _ = cmd.Parameters.AddWithValue("date", portfolioLine.Date is null ? DBNull.Value : portfolioLine.Date);
+            _ = cmd.Parameters.AddWithValue("date", portfolioLine.Date);
             _ = cmd.Parameters.AddWithValue("fund_id", portfolioLine.FundID);
             _ = cmd.Parameters.AddWithValue("quantity", portfolioLine.Quantity);
-            _ = cmd.Parameters.AddWithValue("average_val", portfolioLine.AverageVal is null ? DBNull.Value : portfolioLine.AverageVal);
+            _ = cmd.Parameters.AddWithValue("purchase_val", portfolioLine.PurchaseVal);
             try
             {
                 _ = cmd.ExecuteNonQuery();
@@ -143,13 +143,13 @@ namespace Portfolio.Repositories
                 return;
             }
 
-            string query = "UPDATE portfolio_line SET date=@date,fund_id=@fund_id,quantity=@quantity,average_val=@average_val " +
+            string query = "UPDATE portfolio_line SET date=@date,fund_id=@fund_id,quantity=@quantity,purchase_val=@purchase_val " +
                 "WHERE id=@id;";
             using NpgsqlCommand? cmd = new(query, con);
-            _ = cmd.Parameters.AddWithValue("date", portfolioLine.Date is null ? DBNull.Value : portfolioLine.Date);
+            _ = cmd.Parameters.AddWithValue("date", portfolioLine.Date);
             _ = cmd.Parameters.AddWithValue("fund_id", portfolioLine.FundID);
             _ = cmd.Parameters.AddWithValue("quantity", portfolioLine.Quantity);
-            _ = cmd.Parameters.AddWithValue("average_val", portfolioLine.AverageVal is null ? DBNull.Value : portfolioLine.AverageVal);
+            _ = cmd.Parameters.AddWithValue("purchase_val", portfolioLine.PurchaseVal);
             _ = cmd.Parameters.AddWithValue("id", portfolioLine.ID);
             try
             {

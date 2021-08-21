@@ -14,7 +14,7 @@ namespace Portfolio.Models
         public readonly int CompanyID;
         public readonly string CompanyName;
         public readonly double Quantity;
-        public readonly double? AverageVal;
+        public readonly double? PurchaseVal;
 
         public PortFolioLine(int id = 0,
             int portFolioID = 0,
@@ -24,7 +24,7 @@ namespace Portfolio.Models
             string companyName = "",
             double quantity = 0,
             DateTime? date = null,
-            double? averageVal = null)
+            double? purchaseVal = null)
         {
             ID = id;
             PortFolioID = portFolioID;
@@ -34,7 +34,7 @@ namespace Portfolio.Models
             CompanyName = companyName;
             Quantity = quantity;
             Date = date;
-            AverageVal = averageVal;
+            PurchaseVal = purchaseVal;
         }
     }
 }
