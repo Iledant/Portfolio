@@ -50,7 +50,7 @@ namespace Portfolio.Repositories
             string query = "SELECT f.id,f.name,f.comment,f.isin,f.yahoo_code,c.id,c.name,f.morningstar_id " +
                 $"FROM fund f " +
                 $"JOIN company c ON f.company_id=c.id " +
-                $"WHERE yahoo_code IS NOT NULL";
+                $"WHERE yahoo_code IS NOT NULL AND morningstar_id IS NULL";
             using NpgsqlCommand? cmd = new(query, con);
             List<Fund> funds = new();
             using NpgsqlDataReader? reader = cmd.ExecuteReader();

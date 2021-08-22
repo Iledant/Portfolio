@@ -98,6 +98,7 @@ namespace Portfolio
                     Log.AddLine($"Erreur de récupération de l'historique de {fund.Name} -> {e.Message}");
                 }
             }
+            await FundRepository.UpdateMorningstarHistorical();
         }
 
         private void Settings_Click(object _1, RoutedEventArgs _2)
