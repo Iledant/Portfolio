@@ -304,7 +304,8 @@ namespace Portfolio.Repositories
             int id;
             string upsertQuery = "INSERT INTO fund (name,morningstar_id,company_id) " +
                 "VALUES(@name,@morningstar_id,@company_id) " +
-                "ON CONFLICT(name) DO UPDATE SET morningstar_id=excluded.morningstar_id";
+                "ON CONFLICT(name) DO UPDATE SET morningstar_id=excluded.morningstar_id " +
+                "RETURNING id";
             using NpgsqlCommand? upsertCmd = new(upsertQuery, con);
             _ = upsertCmd.Parameters.AddWithValue("name", line.Name);
             _ = upsertCmd.Parameters.AddWithValue("morningstar_id",line.MorningStarID);
@@ -345,8 +346,8 @@ namespace Portfolio.Repositories
 
             string updateQuery = "INSERT INTO fund_data (fund_id,date,val) " +
                 "SELECT @id,date,val FROM fund_data_import " +
-                "WHERE (@id,date,val) NOT IN " +
-                "  (SELECT fund_id,date,val FROM fund_data)";
+                "WHERE (@id,date) NOT IN " +
+                "  (SELECT fund_id,date FROM fund_data)";
             using NpgsqlCommand? insertCmd = new(updateQuery, con);
             _ = insertCmd.Parameters.AddWithValue("id", fund.ID);
             _ = insertCmd.ExecuteNonQuery();
