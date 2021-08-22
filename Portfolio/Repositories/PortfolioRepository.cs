@@ -152,11 +152,8 @@ namespace Portfolio.Repositories
             NpgsqlConnection? con = DB.GetConnection();
             List<PortFolioLineValue> fundPerfs = new();
             
-            // Il faut reprendre la structure de la table pour imposer une date non nulle dans portfolio_line à utiliser dans la requête ci-dessous et non pas les dates de valeurs historiques du fond
-
-            string historicalQuery = "SELECT pl.fund_id,fd.date,pl.quantity,fd.val FROM portfolio_line pl " +
-                "JOIN fund_data fd ON pl.fund_id=fd.fund_id " +
-                "WHERE pl.id=@portfolio_id ORDER BY 1,2";
+            string historicalQuery = "SELECT pl.fund_id,pl.date,pl.quantity,pl.purchase_val FROM portfolio_line pl " +
+                "WHERE pl.portfolio_id=@portfolio_id ORDER BY 1,2";
             using (NpgsqlCommand? cmd = new(historicalQuery, con))
             {
                 _ = cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
@@ -168,7 +165,7 @@ namespace Portfolio.Repositories
                     int fundId = reader.GetInt32(0);
                     DateTime date = reader.GetDateTime(1);
                     double quantity = reader.GetDouble(2);
-                    double value = reader.GetDouble(2);
+                    double value = reader.GetDouble(3);
                     if (fundId != line.FundID)
                     {
                         if (line.FundID != 0)
@@ -192,10 +189,11 @@ namespace Portfolio.Repositories
                 }
             }
 
-            string nameAndActualValueQuery = "SELECT f.id,f.name,av.val FROM fund f " +
-                "JOIN portfolio_line pf ON pf.fund_id=f.id " +
-                "JOIN (SELECT fund_id,val,max(date) FROM fund_data GROUP BY 1,2) av ON av.fund_id=f.id " +
-                "WHERE pf.id=@portfolio_id ORDER BY 1";
+            string nameAndActualValueQuery = "SELECT DISTINCT f.id,f.name,fd.val FROM fund f " +
+                "JOIN portfolio_line pf ON pf.fund_id = f.id " +
+                "JOIN(SELECT fund_id, max(date) FROM fund_data GROUP BY 1 ORDER BY 1) av ON av.fund_id = f.id "+
+                "JOIN fund_data fd ON av.max = fd.Date AND av.fund_id = fd.fund_id "+
+                "WHERE pf.portfolio_id = @portfolio_id ORDER BY 1";
             using (NpgsqlCommand? cmd = new(nameAndActualValueQuery, con))
             {
                 cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
