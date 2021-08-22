@@ -217,31 +217,11 @@ namespace Portfolio.Repositories
 
             foreach (Fund fund in funds)
             {
-                List<ParsedHistoryDetail>? historical = await GetMorningStarHistorical(fund.MorningstarID);
-
-                using NpgsqlCommand? deleteCmd = new("DELETE FROM fund_data_import", con);
-                _ = deleteCmd.ExecuteNonQuery();
-
-                string insertQuery = "INSERT INTO fund_data_import (date,val) " +
-                    "SELECT * FROM unnest(@d,@v) AS d";
-                using NpgsqlCommand? importCmd = new(insertQuery, con);
-                _ = importCmd.Parameters.Add(new NpgsqlParameter<DateTime[]>("d",
-                    historical.Select(e => e.Date).ToArray()));
-                _ = importCmd.Parameters.Add(new NpgsqlParameter<double[]>("v",
-                    historical.Select(e => e.Value).ToArray()));
-                _ = importCmd.ExecuteNonQuery();
-
-                string updateQuery = "INSERT INTO fund_data (fund_id,date,val) " +
-                    "SELECT @id,date,val FROM fund_data_import " +
-                    "WHERE (@id,date,val) NOT IN " +
-                    "  (SELECT fund_id,date,val FROM fund_data)";
-                using NpgsqlCommand? insertCmd = new(updateQuery, con);
-                _ = insertCmd.Parameters.AddWithValue("id", fund.ID);
-                _ = insertCmd.ExecuteNonQuery();
+                await UpdateMorningstarHistorical(fund);
             }
         }
 
-        private static async Task<List<ParsedHistoryDetail>?> GetMorningStarHistorical(string morningstarID, DateTime? begin = null, DateTime? end = null)
+        private static async Task<List<ParsedHistoryDetail>?> GetMorningstarHistorical(string morningstarID, DateTime? begin = null, DateTime? end = null)
         {
             string endDate = (end ?? DateTime.Now).ToString("yyyy-MM-dd");
             string beginDate = (begin ?? new DateTime(1991, 11, 29)).ToString("yyyy-MM-dd");
@@ -293,8 +273,8 @@ namespace Portfolio.Repositories
         {
             NpgsqlConnection? con = DB.GetConnection();
             int id;
-            string query = "INSERT INTO fund (name,comment,isin,yahoo_code,company_id) " +
-                "VALUES(@name,null,null,@yahoo_code,@company_id) " +
+            string query = "INSERT INTO fund (name,comment,isin,yahoo_code,company_id,morningstar_id) " +
+                "VALUES(@name,null,null,@yahoo_code,@company_id,null) " +
                 "RETURNING id;";
             string name = quote.Longname == "" ? quote.Shortname : quote.Longname;
             using NpgsqlCommand? cmd = new(query, con);
@@ -310,14 +290,66 @@ namespace Portfolio.Repositories
             }
             catch (PostgresException exception)
             {
-                if (exception.SqlState == PostgresErrorCodes.UniqueViolation)
-                {
-                    return (null, DBState.AlreadyExists);
-                }
-                return (null, DBState.Error);
+                return exception.SqlState == PostgresErrorCodes.UniqueViolation ?
+                    ((Fund?, DBState))(null, DBState.AlreadyExists)
+                    : ((Fund?, DBState))(null, DBState.Error);
             }
             Fund fund = new(id, name, companyID, yahooCode: quote.Symbol, morningstarID: null);
             return (fund, DBState.OK);
+        }
+
+        public static (Fund?, DBState) AddMorningstarFund(MorningstarResponseLine line, int companyID)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            int id;
+            string upsertQuery = "INSERT INTO fund (name,morningstar_id,company_id) " +
+                "VALUES(@name,@morningstar_id,@company_id) " +
+                "ON CONFLICT(name) DO UPDATE SET morningstar_id=excluded.morningstar_id";
+            using NpgsqlCommand? upsertCmd = new(upsertQuery, con);
+            _ = upsertCmd.Parameters.AddWithValue("name", line.Name);
+            _ = upsertCmd.Parameters.AddWithValue("morningstar_id",line.MorningStarID);
+            _ = upsertCmd.Parameters.AddWithValue("company_id", companyID);
+            try
+            {
+                using NpgsqlDataReader? reader = upsertCmd.ExecuteReader();
+                _ = reader.Read();
+                id = reader.GetInt32(0);
+            }
+            catch (PostgresException exception)
+            {
+                return exception.SqlState == PostgresErrorCodes.UniqueViolation ?
+                    (null, DBState.AlreadyExists)
+                    : (null, DBState.Error);
+            }
+            Fund fund = new(id, line.Name, companyID, morningstarID: line.MorningStarID);
+            return (fund, DBState.OK);
+        }
+
+        public static async Task UpdateMorningstarHistorical(Fund fund)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+
+            List<ParsedHistoryDetail>? historical = await GetMorningstarHistorical(fund.MorningstarID);
+
+            using NpgsqlCommand? deleteCmd = new("DELETE FROM fund_data_import", con);
+            _ = deleteCmd.ExecuteNonQuery();
+
+            string insertQuery = "INSERT INTO fund_data_import (date,val) " +
+                "SELECT * FROM unnest(@d,@v) AS d";
+            using NpgsqlCommand? importCmd = new(insertQuery, con);
+            _ = importCmd.Parameters.Add(new NpgsqlParameter<DateTime[]>("d",
+                historical.Select(e => e.Date).ToArray()));
+            _ = importCmd.Parameters.Add(new NpgsqlParameter<double[]>("v",
+                historical.Select(e => e.Value).ToArray()));
+            _ = importCmd.ExecuteNonQuery();
+
+            string updateQuery = "INSERT INTO fund_data (fund_id,date,val) " +
+                "SELECT @id,date,val FROM fund_data_import " +
+                "WHERE (@id,date,val) NOT IN " +
+                "  (SELECT fund_id,date,val FROM fund_data)";
+            using NpgsqlCommand? insertCmd = new(updateQuery, con);
+            _ = insertCmd.Parameters.AddWithValue("id", fund.ID);
+            _ = insertCmd.ExecuteNonQuery();
         }
     }
 

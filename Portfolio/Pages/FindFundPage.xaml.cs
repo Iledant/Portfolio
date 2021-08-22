@@ -15,6 +15,7 @@ namespace Portfolio.Pages
     {
         private readonly APIFinanceViewModel ViewModel;
         private int _companyID = 0;
+        private int _morningstarCompanyID = 0;
 
         public FindFundPage()
         {
@@ -26,11 +27,6 @@ namespace Portfolio.Pages
         private void QuoteSearchButton_Click(object _1, RoutedEventArgs _2)
         {
             ViewModel.PickStocks(QuoteTextBox.Text);
-        }
-
-        private void Page_Loaded(object _1, RoutedEventArgs _2)
-        {
-            ViewModel.GetCompanies();
         }
 
         private async void AddFundButton_Click(object _1, RoutedEventArgs _2)
@@ -85,6 +81,43 @@ namespace Portfolio.Pages
                 MorningstarProgressBar.IsIndeterminate = false;
                 await Task.Delay(1);
             }
+        }
+
+        private void MorningstarCompanyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            HideMorningstarStackPanels();
+            if (MorningstarCompanyComboBox.SelectedItem is Company)
+            {
+                _morningstarCompanyID = (MorningstarCompanyComboBox.SelectedItem as Company).ID;
+                MorningstarAddFundButton.IsEnabled = true;
+            }
+            else
+            {
+                MorningstarAddFundButton.IsEnabled = false;
+            }
+        }
+
+        private async void MorningstarAddFundButton_Click(object sender, RoutedEventArgs e)
+        {
+            (Fund fund, DBState state) = FundRepository.AddMorningstarFund(MorningstarStocksList.SelectedItem as MorningstarResponseLine, _morningstarCompanyID);
+            MorningstarErrorStackPanel.Visibility = (state == DBState.AlreadyExists)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            MorningstarOkStackPanel.Visibility = (state == DBState.OK) ? Visibility.Visible : Visibility.Collapsed;
+            await Task.Delay(1);
+            await FundRepository.UpdateMorningstarHistorical(fund);
+        }
+
+        private void HideMorningstarStackPanels()
+        {
+            MorningstarErrorStackPanel.Visibility = Visibility.Collapsed;
+            MorningstarOkStackPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void MorningstarStocksList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MorningstarCompanyComboBox.IsEnabled = MorningstarStocksList.SelectedItem is MorningstarResponseLine;
+            HideMorningstarStackPanels();
         }
     }
 }
