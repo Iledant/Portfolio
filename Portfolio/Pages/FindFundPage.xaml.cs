@@ -75,11 +75,15 @@ namespace Portfolio.Pages
             OkStackPanel.Visibility = Visibility.Collapsed;
         }
 
-        private void MorningstarSearchButton_Click(object sender, RoutedEventArgs e)
+        private async void MorningstarSearchButton_Click(object sender, RoutedEventArgs e)
         {
             if (MorningstarSearch.Text != "")
             {
+                MorningstarProgressBar.IsIndeterminate = true;
+                await Task.Delay(1);
                 ViewModel.MorningstarSearch(MorningstarSearch.Text);
+                MorningstarProgressBar.IsIndeterminate = false;
+                await Task.Delay(1);
             }
         }
     }

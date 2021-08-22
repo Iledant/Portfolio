@@ -107,8 +107,10 @@
                 Click="MorningstarSearchButton_Click" 
                 Grid.Column="1"
                 VerticalAlignment="Bottom">
-                Chercher</Button>
+                Chercher
+            </Button>
         </Grid>
+        <ProgressBar x:Name="MorningstarProgressBar" Foreground="GreenYellow" />
         <GridView 
             x:Name="MornigstarStocksList"
             ItemsSource="{x:Bind ViewModel.MorningstarResponses, Mode=OneWay}"
