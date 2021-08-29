@@ -31,6 +31,7 @@ namespace Portfolio.Controls
         private string _verticalAxisTextFormat;
         private string _horizontalAxisTextFormat;
         private Line[] _horizontalAxisTickMarks;
+        private double _halfDateLabelWidth;
         private TextBlock[] _horizontalLabelTextBoxes;
         private List<FundData> _averageValues;
         #endregion
@@ -55,7 +56,7 @@ namespace Portfolio.Controls
 
         public Brush LegendBackground
         {
-            get { return (Brush)GetValue(LegendBackgroundProperty); }
+            get => (Brush)GetValue(LegendBackgroundProperty);
             set { SetValue(LegendBackgroundProperty, value); }
         }
 
@@ -195,7 +196,7 @@ namespace Portfolio.Controls
 
         public bool IsAverageEnabled
         {
-            get { return (bool)GetValue(IsAverageEnabledProperty); }
+            get => (bool)GetValue(IsAverageEnabledProperty);
             set { 
                 SetValue(IsAverageEnabledProperty, value);
                 GenerateChart();
@@ -205,21 +206,17 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty IsAverageEnabledProperty =
             DependencyProperty.Register(nameof(IsAverageEnabled), typeof(bool), typeof(CandelierChart), new PropertyMetadata(false));
 
-
-
         public int AverageCount
         {
-            get { return (int)GetValue(AverageCountProperty); }
+            get => (int)GetValue(AverageCountProperty);
             set { 
                 SetValue(AverageCountProperty, value);
                 GenerateChart();
             }
         }
 
-        // Using a DependencyProperty as the backing store for AverageCount.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty AverageCountProperty =
             DependencyProperty.Register(nameof(AverageCount), typeof(int), typeof(CandelierChart), new PropertyMetadata(5));
-
 
         #endregion
 
@@ -335,6 +332,7 @@ namespace Portfolio.Controls
             tb.Text = string.Format("{0:dd/MM/yy}", Values[0].Date);
             tb.FontSize = AxisTextSize;
             tb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            _halfDateLabelWidth = tb.DesiredSize.Width / 2;
             _horizontalAxisTextHeight = tb.DesiredSize.Height;
         }
 
@@ -370,7 +368,7 @@ namespace Portfolio.Controls
             }
 
             _firstTicks = Values[0].Date.Ticks;
-            _horizontalScale = (Box.ActualWidth - (2 * ChartPadding) - (2 * InnerMargin) - _verticalAxisTextWidth) / (Values[Values.Count - 1].Date.Ticks - _firstTicks);
+            _horizontalScale = (Box.ActualWidth - (2 * ChartPadding) - (2 * InnerMargin) - _verticalAxisTextWidth - _halfDateLabelWidth) / (Values[Values.Count - 1].Date.Ticks - _firstTicks);
         }
 
         private void DrawBackground()
@@ -442,7 +440,7 @@ namespace Portfolio.Controls
 
             HorizontalAxis.X1 = VerticalAxis.X1;
             HorizontalAxis.Y1 = VerticalAxis.Y2;
-            HorizontalAxis.X2 = Box.ActualWidth - ChartPadding;
+            HorizontalAxis.X2 = Box.ActualWidth - ChartPadding - _halfDateLabelWidth;
             HorizontalAxis.Y2 = VerticalAxis.Y2;
         }
 
