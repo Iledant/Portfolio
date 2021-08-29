@@ -77,14 +77,27 @@ namespace Portfolio.Repositories
         public static void Insert(PortFolio portfolio)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = $"INSERT INTO portfolio (name,comment) VALUES(@name,@comment);";
-            using NpgsqlCommand? cmd = new(query, con);
-            _ = cmd.Parameters.AddWithValue("name", portfolio.Name);
-            _ = cmd.Parameters.AddWithValue("comment",
-                Repository.ConvertNullableStringParam(portfolio.Comment));
             try
             {
-                _ = cmd.ExecuteNonQuery();
+                string createPortFolioQry = "INSERT INTO portfolio (name,comment) VALUES(@name,@comment) RETURNING id;";
+                using NpgsqlCommand? cmd = new(createPortFolioQry, con);
+                _ = cmd.Parameters.AddWithValue("name", portfolio.Name);
+                _ = cmd.Parameters.AddWithValue("comment",
+                    Repository.ConvertNullableStringParam(portfolio.Comment));
+                using NpgsqlDataReader? reader = cmd.ExecuteReader();
+                reader.Read();
+                int portfolioID = reader.GetInt32(0);
+
+                string createCashAccountQry = $"INSERT INTO cash_account (portfolio_id) VALUES ({portfolio}) RETURNING id";
+                using NpgsqlCommand? cashAccountCmd = new(createCashAccountQry, con);
+                using NpgsqlDataReader? cashAccountIDReader = cmd.ExecuteReader();
+                cashAccountIDReader.Read();
+                int cashAccountID = reader.GetInt32(0);
+
+                string insertNullLineCashAccountQry = $"INSERT INTO cash_account_line (portfolio_id,date,val) VALUES({portfolioID},@date,0)";
+                using NpgsqlCommand? insertNullLineCashAccountCmd = new(insertNullLineCashAccountQry, con);
+                insertNullLineCashAccountCmd.Parameters.AddWithValue("date", DateTime.Now);
+                _ = insertNullLineCashAccountCmd.ExecuteNonQuery();
                 DB.State = DBState.OK;
             }
             catch (PostgresException exception)
