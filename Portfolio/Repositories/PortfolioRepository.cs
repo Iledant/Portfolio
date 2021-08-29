@@ -24,14 +24,7 @@ namespace Portfolio.Repositories
             ActualValue = actualValue;
             Quantity = quantity;
             AverageValue = averageValue;
-            if (averageValue != 0)
-            {
-                Evolution = actualValue / averageValue - 1.0;
-            }
-            else
-            {
-                Evolution = 0;
-            }
+            Evolution = averageValue != 0 ? actualValue / averageValue - 1.0 : 0;
             Gain = (ActualValue - AverageValue) * Quantity;
         }
     }
