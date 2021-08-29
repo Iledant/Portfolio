@@ -146,10 +146,13 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\CashAccountLine.cs" />
     <Compile Include="Models\Company.cs" />
     <Compile Include="Models\Fund.cs" />
     <Compile Include="Models\FundData.cs" />
     <Compile Include="Models\FundDataImport.cs" />
+    <Compile Include="Models\MonetaryAccount.cs" />
+    <Compile Include="Models\MonetaryAccoutLine.cs" />
     <Compile Include="Models\PortFolio.cs" />
     <Compile Include="Models\PortFolioLine.cs" />
     <Compile Include="Pages\CompaniesPage .xaml.cs">
