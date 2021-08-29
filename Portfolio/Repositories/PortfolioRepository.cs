@@ -162,7 +162,7 @@ namespace Portfolio.Repositories
         {
             NpgsqlConnection? con = DB.GetConnection();
             List<PortFolioLineValue> fundPerfs = new();
-            
+
             string historicalQuery = "SELECT pl.fund_id,pl.date,pl.quantity,pl.purchase_val FROM portfolio_line pl " +
                 "WHERE pl.portfolio_id=@portfolio_id ORDER BY 1,2";
             using (NpgsqlCommand? cmd = new(historicalQuery, con))
@@ -202,8 +202,8 @@ namespace Portfolio.Repositories
 
             string nameAndActualValueQuery = "SELECT DISTINCT f.id,f.name,fd.val FROM fund f " +
                 "JOIN portfolio_line pf ON pf.fund_id = f.id " +
-                "JOIN(SELECT fund_id, max(date) FROM fund_data GROUP BY 1 ORDER BY 1) av ON av.fund_id = f.id "+
-                "JOIN fund_data fd ON av.max = fd.Date AND av.fund_id = fd.fund_id "+
+                "JOIN(SELECT fund_id, max(date) FROM fund_data GROUP BY 1 ORDER BY 1) av ON av.fund_id = f.id " +
+                "JOIN fund_data fd ON av.max = fd.Date AND av.fund_id = fd.fund_id " +
                 "WHERE pf.portfolio_id = @portfolio_id ORDER BY 1";
             using (NpgsqlCommand? cmd = new(nameAndActualValueQuery, con))
             {
@@ -260,6 +260,52 @@ namespace Portfolio.Repositories
                 lines.Add(new(id: 0, fundId: 0, date: reader.GetDateTime(0), val: reader.GetDouble(1)));
             }
             return lines;
+        }
+
+        public static List<FundLookUp> GetFundLookUps(int portfolioID)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            List<FundLookUp> funds = new();
+
+            string query = "WITH funds AS (SELECT DISTINCT f.id,f.name FROM fund f " +
+                "JOIN portfolio_line pl ON pl.fund_id = f.id " +
+                $"WHERE pl.portfolio_id = {portfolioID}), " +
+                "last_val AS(SELECT fund_id, max(date) FROM fund_data GROUP BY 1 ORDER BY 1), " +
+                "fd_d7 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '7'), " +
+                "fd_d8 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '8'), " +
+                "fd_d9 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '9'), " +
+                "fd_d31 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '31'), " +
+                "fd_d32 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '32'), " +
+                "fd_d33 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '33'), " +
+                "fd_d365 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '365'), " +
+                "fd_d366 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '366'), " +
+                "fd_d367 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '367') " +
+                "SELECT f.id,f.name,fd.val,COALESCE(fd_d7.val, fd_d8.val, fd_d9.val)," +
+                    "COALESCE(fd_d31.val, fd_d32.val, fd_d33.val)," +
+                    "COALESCE(fd_d365.val, fd_d366.val, fd_d367.val) FROM funds f " +
+                "JOIN last_val ON last_val.fund_id = f.id " +
+                "JOIN fund_data fd ON fd.fund_id = last_val.fund_id AND fd.date = last_val.max " +
+                "LEFT JOIN fd_d7 ON fd_d7.fund_id = f.id " +
+                "LEFT JOIN fd_d8 ON fd_d8.fund_id = f.id " +
+                "LEFT JOIN fd_d9 ON fd_d9.fund_id = f.id " +
+                "LEFT JOIN fd_d31 ON fd_d31.fund_id = f.id " +
+                "LEFT JOIN fd_d32 ON fd_d32.fund_id = f.id " +
+                "LEFT JOIN fd_d33 ON fd_d33.fund_id = f.id " +
+                "LEFT JOIN fd_d365 ON fd_d365.fund_id = f.id " +
+                "LEFT JOIN fd_d366 ON fd_d366.fund_id = f.id " +
+                "LEFT JOIN fd_d367 ON fd_d367.fund_id = f.id";
+            using NpgsqlCommand? cmd = new(query, con);
+            using NpgsqlDataReader? reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                funds.Add(new(fundID: reader.GetInt32(0),
+                    fundName: reader.GetString(1),
+                    actualValue: reader.GetDouble(2),
+                    lastWeekValue: reader.GetDouble(3),
+                    lastMonthValue: reader.GetDouble(4),
+                    lastYearValue: reader.GetDouble(5)));
+            }
+            return funds;
         }
     }
 }
