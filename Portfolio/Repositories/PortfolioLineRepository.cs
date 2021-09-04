@@ -40,37 +40,48 @@ namespace Portfolio.Repositories
             return lines;
         }
 
-        public static List<PortFolioLine> GetFromPortFolio(PortFolio portfolio, string pattern)
+        public static (List<PortFolioLine>, double) GetFromPortFolio(PortFolio portfolio, string pattern)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.purchase_val,l.portfolio_id,c.id,c.name " +
+            string getLinesQry = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.purchase_val,l.portfolio_id,c.id,c.name " +
                 "FROM portfolio_line l " +
                 "JOIN fund f ON l.fund_id=f.id " +
                 "JOIN company c ON f.company_id=c.id " +
                 "JOIN portfolio p ON l.portfolio_id=p.id " +
                 "WHERE f.name ILIKE '%' || unaccent(@pattern) || '%' " +
                 $"OR c.name ILIKE '%' || unaccent(@pattern) || '%' AND p.id=@id ORDER BY 1";
-            using NpgsqlCommand? cmd = new(query, con);
-            _ = cmd.Parameters.AddWithValue("pattern", pattern);
-            _ = cmd.Parameters.AddWithValue("id", portfolio.ID);
             List<PortFolioLine> lines = new();
-            using NpgsqlDataReader? reader = cmd.ExecuteReader();
-            while (reader.Read())
+            double cash = 0;
+            using (NpgsqlCommand? cmd = new(getLinesQry, con))
             {
-                lines.Add(
-                    new(
-                        id: reader.GetInt32(0),
-                        portFolioID: reader.GetInt32(6),
-                        date: reader.IsDBNull(1) ? null : reader.GetDateTime(1),
-                        fundId: reader.GetInt32(2),
-                        fundName: reader.GetString(3),
-                        quantity: reader.GetDouble(4),
-                        purchaseVal: reader.IsDBNull(5) ? null : reader.GetDouble(5),
-                        companyID: reader.GetInt32(7),
-                        companyName: reader.GetString(8))
-                    );
+                _ = cmd.Parameters.AddWithValue("pattern", pattern);
+                _ = cmd.Parameters.AddWithValue("id", portfolio.ID);
+                using NpgsqlDataReader? reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lines.Add(
+                        new(
+                            id: reader.GetInt32(0),
+                            portFolioID: reader.GetInt32(6),
+                            date: reader.IsDBNull(1) ? null : reader.GetDateTime(1),
+                            fundId: reader.GetInt32(2),
+                            fundName: reader.GetString(3),
+                            quantity: reader.GetDouble(4),
+                            purchaseVal: reader.IsDBNull(5) ? null : reader.GetDouble(5),
+                            companyID: reader.GetInt32(7),
+                            companyName: reader.GetString(8))
+                        );
+                }
             }
-            return lines;
+
+            string getCashQry = $"SELECT sum(val) FROM cash_account_line WHERE portfolio_id={portfolio.ID}";
+            using (NpgsqlCommand? cmd = new(getCashQry,con))
+            {
+                using NpgsqlDataReader? reader = cmd.ExecuteReader();
+                _ = reader.Read();
+                cash = reader.GetDouble(0);
+            }
+            return (lines,cash);
         }
 
         private static DBState CheckQuantity(NpgsqlConnection? con, PortFolioLine portfolioLine)

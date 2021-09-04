@@ -32,7 +32,7 @@ namespace Portfolio.Pages
             NavigationViewItem selected = args.SelectedItem as NavigationViewItem;
             _ = selected.Tag switch
             {
-                "Funds" => contentFrame.Navigate(typeof(PortFolioPage), _portfolio),
+                "Funds" => contentFrame.Navigate(typeof(PortFolioFundsPage), _portfolio),
                 "Performance" => contentFrame.Navigate(typeof(PortFolioPerformancePage), _portfolio),
                 "Historical" => contentFrame.Navigate(typeof(PortFolioHistoricalPage), _portfolio),
                 "FundsLookUp" => contentFrame.Navigate(typeof(PortFolioFundsLookUp), _portfolio),

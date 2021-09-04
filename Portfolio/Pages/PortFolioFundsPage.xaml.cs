@@ -11,13 +11,13 @@ namespace Portfolio.Pages
     /// <summary>
     /// La page de gestion des fonds d'un portefeuille.
     /// </summary>
-    public sealed partial class PortFolioPage : Page
+    public sealed partial class PortFolioFundsPage : Page
     {
         private PortFolio _portfolio;
         private string _search = "";
         private readonly PortFolioViewModel ViewModel;
 
-        public PortFolioPage()
+        public PortFolioFundsPage()
         {
             InitializeComponent();
             ViewModel = new();

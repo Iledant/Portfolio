@@ -34,6 +34,16 @@ namespace Portfolio.ViewModel
             return "{prefix}-";
         }
 
+        public static string NullCurrencyDisplay(string prefix, double? val)
+        {
+            if (val is not null)
+            {
+                double v = (double)val;
+                return $"{prefix}{v:c}";
+            }
+            return "{prefix}-";
+        }
+
         public static string NullIntDisplay(string prefix, int? val)
         {
             if (val is not null)
