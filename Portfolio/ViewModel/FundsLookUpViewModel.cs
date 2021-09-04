@@ -6,7 +6,7 @@ namespace Portfolio.ViewModel
     public class FundsLookUpViewModel : Bindable
     {
         private PortFolio _portfolio;
-        private List<FundLookUp> _funds;
+        private List<FundLookUp> _funds = new();
 
         public PortFolio PortFolio
         {
