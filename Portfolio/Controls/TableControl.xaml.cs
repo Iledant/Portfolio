@@ -51,7 +51,7 @@ namespace Portfolio.Controls
         public HeaderSortState State;
     }
 
-    public sealed partial class Table : UserControl
+    public sealed partial class TableControl : UserControl
     {
         #region private members
         private readonly CultureInfo _ci = new("fr-FR");
@@ -66,7 +66,7 @@ namespace Portfolio.Controls
         #endregion
 
         #region constructor
-        public Table()
+        public TableControl()
         {
             InitializeComponent();
         }
@@ -90,7 +90,7 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty TableContentProperty =
             DependencyProperty.Register(nameof(TableContent),
                 typeof(TableContent),
-                typeof(Table),
+                typeof(TableControl),
                 new PropertyMetadata(null));
 
         public Brush HeaderForeground
@@ -102,7 +102,7 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty HeaderForegroundProperty =
             DependencyProperty.Register(nameof(HeaderForeground),
                 typeof(Brush),
-                typeof(Table),
+                typeof(TableControl),
                 new PropertyMetadata(new SolidColorBrush(Colors.Black)));
 
         public Brush CellBackground
@@ -114,7 +114,7 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty CellBackgroundProperty =
             DependencyProperty.Register(nameof(CellBackground),
                 typeof(Brush),
-                typeof(Table),
+                typeof(TableControl),
                 new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 10, 16, 16))));
 
         public Brush CellForeground
@@ -126,7 +126,7 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty CellForegroundProperty =
             DependencyProperty.Register(nameof(CellForeground),
                 typeof(Brush),
-                typeof(Table),
+                typeof(TableControl),
                 new PropertyMetadata(new SolidColorBrush(Colors.White)));
 
         public Brush HeaderCellBackground
@@ -138,7 +138,7 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty HeaderCellBackgroundProperty =
             DependencyProperty.Register(nameof(HeaderCellBackground),
                 typeof(Brush),
-                typeof(Table),
+                typeof(TableControl),
                 new PropertyMetadata(new SolidColorBrush(Colors.CadetBlue)));
 
         public Brush HeaderCellForeground
@@ -150,7 +150,7 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty HeaderCellForegroundProperty =
             DependencyProperty.Register(nameof(HeaderCellForeground),
                 typeof(Brush),
-                typeof(Table),
+                typeof(TableControl),
                 new PropertyMetadata(new SolidColorBrush(Colors.Black)));
 
         public Brush PointeredCellBackground
@@ -162,7 +162,7 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty PointeredCellBackgroundProperty =
             DependencyProperty.Register(nameof(PointeredCellBackground),
                 typeof(Brush),
-                typeof(Table),
+                typeof(TableControl),
                 new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 19, 31, 32))));
 
         public Thickness CellPadding
@@ -174,20 +174,8 @@ namespace Portfolio.Controls
         public static readonly DependencyProperty CellPaddingProperty =
             DependencyProperty.Register(nameof(CellPadding),
                 typeof(int),
-                typeof(Table),
+                typeof(TableControl),
                 new PropertyMetadata(new Thickness(6)));
-
-        public List<string> Headers
-        {
-            get => (List<string>)GetValue(HeadersProperty);
-            set => SetValue(HeadersProperty, value);
-        }
-
-        public static readonly DependencyProperty HeadersProperty =
-            DependencyProperty.Register("Headers",
-                typeof(List<string>),
-                typeof(Table),
-                new PropertyMetadata(new List<string>()));
         #endregion
 
         #region methods
@@ -243,14 +231,14 @@ namespace Portfolio.Controls
         #region private methods
         private void AddHeaders()
         {
-            for (int i = 0; i < Headers.Count; i++)
+            for (int i = 0; i < TableContent.Headers.Count; i++)
             {
                 ColumnDefinition columnDefinition = new();
                 columnDefinition.Width = GridLength.Auto;
                 Table.ColumnDefinitions.Add(columnDefinition);
             }
 
-            for (int i = 0; i < Headers.Count; i++)
+            for (int i = 0; i < TableContent.Headers.Count; i++)
             {
                 Border border = new();
                 border.Background = HeaderCellBackground;
@@ -262,14 +250,13 @@ namespace Portfolio.Controls
                 TextBlock textBlock = new();
                 textBlock.TextAlignment = TextAlignment.Center;
                 textBlock.Foreground = HeaderForeground;
-                textBlock.Text = Headers[i];
+                textBlock.Text = TableContent.Headers[i].GetText();
                 SmallSortHeaderIcon sortIcon = new();
                 sortIcon.Clicked += SortIcon_Clicked;
                 _sortIcons.Add(sortIcon);
                 stackPanel.Children.Add(textBlock);
                 stackPanel.Children.Add(sortIcon);
                 border.Child = stackPanel;
-                Grid.SetColumn(border, i);
                 Table.Children.Add(border);
             }
             Table.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
@@ -314,11 +301,11 @@ namespace Portfolio.Controls
 
         private void GenerateTable()
         {
-            AddHeaders();
-            for (int i = 0; i < TableContent.Cells.Count + 1; i++)
+            for (int i = 0; i < TableContent.Cells.Count + 2; i++)
             {
                 Table.RowDefinitions.Add(new());
             }
+            AddHeaders();
 
             _cellBeginIndex = Table.Children.Count;
             for (int i = 0; i < TableContent.Cells.Count; i++)
@@ -340,8 +327,8 @@ namespace Portfolio.Controls
                     TableContent.BottomCells[i].GetAlignment(),
                     i,
                     _rowsCount + 1,
-                    HeaderCellForeground,
-                    HeaderCellBackground);
+                    HeaderCellBackground,
+                    HeaderCellForeground);
             }
         }
 
@@ -371,9 +358,9 @@ namespace Portfolio.Controls
             TextBlock textblock;
             for (int i = 0; i < TableContent.Cells.Count; i++)
             {
-                for (int j = 0; j < TableContent.Cells[i].Count; j++)
+                for (int j = 0; j < TableContent.Headers.Count; j++)
                 {
-                    border = (Border)Table.Children[_cellBeginIndex + (i * 6)];
+                    border = (Border)Table.Children[_cellBeginIndex + (i * 6) + j];
                     textblock = (TextBlock)border.Child;
                     textblock.Text = TableContent.Cells[i][j].GetText();
                 }
