@@ -83,7 +83,10 @@ namespace Portfolio.Controls
             set
             {
                 SetValue(TableContentProperty, value);
-                GenerateTable();
+                if (value is not null)
+                {
+                    GenerateTable();
+                }
             }
         }
 
