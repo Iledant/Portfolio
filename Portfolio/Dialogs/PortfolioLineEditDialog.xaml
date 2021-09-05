@@ -30,6 +30,17 @@
             <TextBox Grid.Column="0" Header="Quantité" x:Name="QuantityTextBox" TextChanged="QuantityTextBox_TextChanged" />
             <TextBox Grid.Column="1" x:Name="AveragePriceTextBox" Header ="Prix" TextChanged="AveragePriceTextBox_TextChanged"/>
         </Grid>
+        <StackPanel Orientation="Horizontal">
+            <RadioButton Content="Achat" GroupName="SellBuyGroup" x:Name="BuyButton" Checked="SellBuyChecked" />
+            <RadioButton Content="Vente" GroupName="SellBuyGroup" x:Name="SellButton" Checked="SellBuyChecked" />
+        </StackPanel>
         <DatePicker x:Name="DatePicker" Header="Date" DateChanged="DatePicker_DateChanged"/>
+        <ComboBox x:Name="AccountSource" Header="Depuis/vers" HorizontalAlignment="Stretch" SelectionChanged="AccountSource_SelectionChanged">
+            <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="local:AccountItem">
+                    <TextBlock Text="{x:Bind Name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
     </StackPanel>
 </ContentDialog>

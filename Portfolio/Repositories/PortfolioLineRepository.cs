@@ -12,7 +12,7 @@ namespace Portfolio.Repositories
         public static List<PortFolioLine> Get(string pattern)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string query = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.purchase_val,l.portfolio_id,c.id,c.name " +
+            string query = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.purchase_val,l.portfolio_id,c.id,c.name,l.account_id " +
                 "FROM portfolio_line l " +
                 "JOIN fund f ON l.fund_id=f.id " +
                 "JOIN company c ON f.company_id=c.id " +
@@ -34,7 +34,8 @@ namespace Portfolio.Repositories
                         quantity: reader.GetDouble(4),
                         purchaseVal: reader.IsDBNull(5) ? null : reader.GetDouble(5),
                         companyID: reader.GetInt32(7),
-                        companyName: reader.GetString(8))
+                        companyName: reader.GetString(8),
+                        accountID:reader.GetInt32(9))
                     );
             }
             return lines;
@@ -43,7 +44,7 @@ namespace Portfolio.Repositories
         public static (List<PortFolioLine>, double) GetFromPortFolio(PortFolio portfolio, string pattern)
         {
             NpgsqlConnection? con = DB.GetConnection();
-            string getLinesQry = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.purchase_val,l.portfolio_id,c.id,c.name " +
+            string getLinesQry = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.purchase_val,l.portfolio_id,c.id,c.name,l.account_id " +
                 "FROM portfolio_line l " +
                 "JOIN fund f ON l.fund_id=f.id " +
                 "JOIN company c ON f.company_id=c.id " +
@@ -69,7 +70,8 @@ namespace Portfolio.Repositories
                             quantity: reader.GetDouble(4),
                             purchaseVal: reader.IsDBNull(5) ? null : reader.GetDouble(5),
                             companyID: reader.GetInt32(7),
-                            companyName: reader.GetString(8))
+                            companyName: reader.GetString(8),
+                            accountID: reader.GetInt32(9))
                         );
                 }
             }
@@ -120,13 +122,14 @@ namespace Portfolio.Repositories
                 return;
             }
 
-            string insertQuery = $"INSERT INTO portfolio_line (date,fund_id,quantity,purchase_val) " +
-                $"VALUES(@date,@fund_id,@quantity,@purchase_val);";
+            string insertQuery = $"INSERT INTO portfolio_line (date,fund_id,quantity,purchase_val,account_id) " +
+                $"VALUES(@date,@fund_id,@quantity,@purchase_val,@account_id);";
             using NpgsqlCommand? cmd = new(insertQuery, con);
             _ = cmd.Parameters.AddWithValue("date", portfolioLine.Date);
             _ = cmd.Parameters.AddWithValue("fund_id", portfolioLine.FundID);
             _ = cmd.Parameters.AddWithValue("quantity", portfolioLine.Quantity);
             _ = cmd.Parameters.AddWithValue("purchase_val", portfolioLine.PurchaseVal);
+            _ = cmd.Parameters.AddWithValue("account_id", portfolioLine.AccountID);
             try
             {
                 _ = cmd.ExecuteNonQuery();
@@ -154,7 +157,7 @@ namespace Portfolio.Repositories
                 return;
             }
 
-            string query = "UPDATE portfolio_line SET date=@date,fund_id=@fund_id,quantity=@quantity,purchase_val=@purchase_val " +
+            string query = "UPDATE portfolio_line SET date=@date,fund_id=@fund_id,quantity=@quantity,purchase_val=@purchase_val,account_id=@account_id " +
                 "WHERE id=@id;";
             using NpgsqlCommand? cmd = new(query, con);
             _ = cmd.Parameters.AddWithValue("date", portfolioLine.Date);
@@ -162,6 +165,7 @@ namespace Portfolio.Repositories
             _ = cmd.Parameters.AddWithValue("quantity", portfolioLine.Quantity);
             _ = cmd.Parameters.AddWithValue("purchase_val", portfolioLine.PurchaseVal);
             _ = cmd.Parameters.AddWithValue("id", portfolioLine.ID);
+            _ = cmd.Parameters.AddWithValue("account_id", portfolioLine.AccountID);
             try
             {
                 _ = cmd.ExecuteNonQuery();

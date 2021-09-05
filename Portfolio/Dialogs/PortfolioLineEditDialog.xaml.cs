@@ -2,10 +2,25 @@
 using Portfolio.Repositories;
 using System;
 using System.Collections.Generic;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 namespace Portfolio.Dialogs
 {
+    public class AccountItem
+    {
+        public string Name;
+        public int ID;
+        public bool IsCashAccount;
+
+        public AccountItem(string text, int id, bool isCashAccount)
+        {
+            Name = text;
+            ID = id;
+            IsCashAccount = isCashAccount;
+        }
+    }
+
     public sealed partial class PortFolioLineEditDialog : ContentDialog
     {
         private readonly List<Fund> _funds;
@@ -13,6 +28,8 @@ namespace Portfolio.Dialogs
         private double? _quantity;
         private double? _purchaseValue;
         private DateTime? _date;
+        private bool _buy;
+        private AccountItem _sourceAccount;
 
         #region constructor
         public PortFolioLineEditDialog()
@@ -25,12 +42,15 @@ namespace Portfolio.Dialogs
             InitializeComponent();
             _line = portFolioLine;
             _funds = FundRepository.Get("");
+            FillAccountComboBox();
             FundComboBox.ItemsSource = _funds;
             if (_line.ID == 0)
             {
                 _quantity = null;
                 _purchaseValue = null;
                 _date = null;
+                _buy = true;
+                _sourceAccount = null;
                 FundComboBox.SelectedItem = null;
                 QuantityTextBox.Text = "";
                 AveragePriceTextBox.Text = "";
@@ -49,13 +69,24 @@ namespace Portfolio.Dialogs
                 }
                 _date = _line.Date;
                 _quantity = _line.Quantity;
-                _purchaseValue = _line.PurchaseVal;
-                QuantityTextBox.Text = _line.Quantity.ToString();
-                AveragePriceTextBox.Text = _line.PurchaseVal.ToString();
+                _purchaseValue = Math.Abs((double)_line.PurchaseVal);
+                QuantityTextBox.Text = _quantity.ToString();
+                AveragePriceTextBox.Text = _purchaseValue.ToString();
+                foreach (AccountItem account in AccountSource.Items)
+                {
+                    if (account.ID == _line.AccountID)
+                    {
+                        AccountSource.SelectedItem = account;
+                        _sourceAccount = account;
+                        break;
+                    }
+                }
                 PrimaryButtonText = "Modifier";
                 Title = "Modifier la ligne";
             }
             DatePicker.SelectedDate = _date;
+            BuyButton.IsChecked = _buy;
+            SellButton.IsChecked = !_buy;
             CheckValues();
         }
         #endregion
@@ -66,10 +97,11 @@ namespace Portfolio.Dialogs
             Fund fund = FundComboBox.SelectedItem as Fund;
             PortFolioLine line = new(id: _line.ID,
                 fundId: fund.ID,
-                quantity: (double)_quantity,
+                quantity: _buy ? (double)_quantity: -(double)_quantity,
                 purchaseVal: _purchaseValue,
                 date: _date,
-                portFolioID: _line.PortFolioID);
+                portFolioID: _line.PortFolioID,
+                accountID: _sourceAccount.ID);
             if (line.ID == 0)
             {
                 PortfolioLineRepository.Insert(line);
@@ -122,14 +154,37 @@ namespace Portfolio.Dialogs
         #endregion
 
         #region private methods
-
         private void CheckValues()
         {
             IsPrimaryButtonEnabled = _quantity is not null
                 && _date is not null
                 && _purchaseValue is not null
-                && FundComboBox.SelectedItem is not null;
+                && FundComboBox.SelectedItem is not null
+                && _sourceAccount is not null;
+        }
+
+        private void SellBuyChecked(object sender, RoutedEventArgs e)
+        {
+            _buy = sender == BuyButton;
+        }
+
+        private void FillAccountComboBox()
+        {
+            List<AccountItem> accountItems = new();
+            accountItems.Add(new("Compte courant", 0, true));
+            List<MonetaryAccount> monetaryAccounts = PortfolioRepository.GetMonetaryAccounts(_line.PortFolioID);
+            foreach (MonetaryAccount account in monetaryAccounts)
+            {
+                accountItems.Add(new(account.Name, account.ID, false));
+            }
+            AccountSource.ItemsSource = accountItems;
         }
         #endregion
+
+        private void AccountSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _sourceAccount = AccountSource.SelectedItem as AccountItem;
+            CheckValues();
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace Portfolio.Models
         public readonly string CompanyName;
         public readonly double Quantity;
         public readonly double? PurchaseVal;
+        public readonly int AccountID;
 
         public PortFolioLine(int id = 0,
             int portFolioID = 0,
@@ -24,7 +25,8 @@ namespace Portfolio.Models
             string companyName = "",
             double quantity = 0,
             DateTime? date = null,
-            double? purchaseVal = null)
+            double? purchaseVal = null,
+            int accountID = 0)
         {
             ID = id;
             PortFolioID = portFolioID;
@@ -35,6 +37,7 @@ namespace Portfolio.Models
             Quantity = quantity;
             Date = date;
             PurchaseVal = purchaseVal;
+            AccountID = accountID;
         }
     }
 }

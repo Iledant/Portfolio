@@ -298,5 +298,20 @@ namespace Portfolio.Repositories
             }
             return funds;
         }
+
+        public static List<MonetaryAccount> GetMonetaryAccounts(int portfolioID)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            string selectQry = "SELECT m.id,m.name,p.name FROM monetary_account m " +
+                $"JOIN portfolio p ON m.portfolio_id=p.id WHERE p.id = {portfolioID}";
+            using NpgsqlCommand? selectCmd = new(selectQry, con);
+            using NpgsqlDataReader? reader = selectCmd.ExecuteReader();
+            List<MonetaryAccount> accounts = new();
+            while (reader.Read())
+            {
+                accounts.Add(new(id: reader.GetInt32(0), name: reader.GetString(1),portfolioID: portfolioID,portfolioName:reader.GetString(2)));
+            }
+            return accounts;
+        }
     }
 }
