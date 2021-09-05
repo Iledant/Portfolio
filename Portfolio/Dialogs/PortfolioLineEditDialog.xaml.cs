@@ -56,6 +56,7 @@ namespace Portfolio.Dialogs
                 Title = "Modifier la ligne";
             }
             DatePicker.SelectedDate = _date;
+            CheckValues();
         }
         #endregion
 
@@ -94,7 +95,10 @@ namespace Portfolio.Dialogs
 
         private void FundComboBox_SelectionChanged(object _1, SelectionChangedEventArgs _2)
         {
-            CheckValues();
+            if (FundComboBox.IsLoaded)
+            {
+                CheckValues();
+            }
         }
 
         private void DatePicker_DateChanged(object _, DatePickerValueChangedEventArgs e)

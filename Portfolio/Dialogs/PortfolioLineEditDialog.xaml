@@ -22,8 +22,14 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <TextBox Header="Quantité" x:Name="QuantityTextBox" TextChanged="QuantityTextBox_TextChanged" />
-        <DatePicker x:Name="DatePicker" Header="Date d'achat" DateChanged="DatePicker_DateChanged"/>
-        <TextBox  x:Name="AveragePriceTextBox" Header ="Prix d'achat" TextChanged="AveragePriceTextBox_TextChanged"/>
+        <Grid ColumnSpacing="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Header="Quantité" x:Name="QuantityTextBox" TextChanged="QuantityTextBox_TextChanged" />
+            <TextBox Grid.Column="1" x:Name="AveragePriceTextBox" Header ="Prix" TextChanged="AveragePriceTextBox_TextChanged"/>
+        </Grid>
+        <DatePicker x:Name="DatePicker" Header="Date" DateChanged="DatePicker_DateChanged"/>
     </StackPanel>
 </ContentDialog>
