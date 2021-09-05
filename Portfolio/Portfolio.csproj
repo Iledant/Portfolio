@@ -130,6 +130,9 @@
     <Compile Include="Controls\SmallSortHeaderIcon.xaml.cs">
       <DependentUpon>SmallSortHeaderIcon.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Table.xaml.cs">
+      <DependentUpon>Table.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\CompanyEditDialog.xaml.cs">
       <DependentUpon>CompanyEditDialog.xaml</DependentUpon>
     </Compile>
@@ -245,6 +248,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\SmallSortHeaderIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Table.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
