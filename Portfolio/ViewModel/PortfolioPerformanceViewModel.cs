@@ -2,16 +2,57 @@
 using Portfolio.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using Windows.UI.Xaml;
 
 namespace Portfolio.ViewModel
 {
     public enum HeaderName { None = -1, Fund = 0, Quantity = 1, AverageValue = 2, Value = 3, Gain = 4, Performance = 5 };
+
+    public class TextCell : ICellContent
+    {
+        public TextAlignment Alignment;
+        public string Text;
+        private readonly static CultureInfo _ci = new("fr-FR");
+
+        public TextCell(string text, TextAlignment alignment)
+        {
+            Text = text;
+            Alignment = alignment;
+        }
+
+        public static TextCell FromDouble(double value)
+        {
+            return new(value.ToString("N2", _ci), TextAlignment.Right);
+        }
+
+        public static TextCell FromCurrency(double currency)
+        {
+            return new(currency.ToString("C", _ci), TextAlignment.Right);
+        }
+
+        public static TextCell FromPercentage(double percentage)
+        {
+            return new(percentage.ToString("P", _ci), TextAlignment.Right);
+        }
+
+        public TextAlignment GetAlignment()
+        {
+            return Alignment;
+        }
+
+        public string GetText()
+        {
+            return Text;
+        }
+    }
 
     public class PortfolioPerformanceViewModel : Bindable
     {
         private HeaderSortState _headerState = HeaderSortState.Ascending;
         private HeaderName _selectedHeader = HeaderName.Fund;
         private double _totalInitialValue, _totalActualValue, _totalGain, _totalPerformance;
+        private TableContent _tableContent;
 
         public List<PortFolioLineValue> Values { get; private set; } = new();
         public double TotalInitialValue => _totalInitialValue;
@@ -25,6 +66,16 @@ namespace Portfolio.ViewModel
         public HeaderSortState GainHeaderState => GetHeaderState(HeaderName.Gain);
         public HeaderSortState PerformanceHeaderState => GetHeaderState(HeaderName.Performance);
 
+        public TableContent TableContent
+        {
+            get => _tableContent;
+            set
+            {
+                _tableContent = value;
+                OnPropertyChanged(nameof(TableContent));
+            }
+        }
+
         public void FetchValues(int portfolioID)
         {
             Values = PortfolioRepository.GetActualValue(portfolioID);
@@ -37,6 +88,64 @@ namespace Portfolio.ViewModel
             }
             _totalGain = _totalActualValue - _totalInitialValue;
             _totalPerformance = _totalGain / _totalInitialValue;
+
+            List<ICellContent> headers = new();
+            headers.Add(new TextCell("Fond", TextAlignment.Center));
+            headers.Add(new TextCell("Quantité", TextAlignment.Center));
+            headers.Add(new TextCell("PRM", TextAlignment.Center));
+            headers.Add(new TextCell("Valeur", TextAlignment.Center));
+            headers.Add(new TextCell("Gain", TextAlignment.Center));
+            headers.Add(new TextCell("Perf.", TextAlignment.Center));
+
+            List<ICellContent> bottomCells = new();
+            bottomCells.Add(new TextCell("Total", TextAlignment.Left));
+            bottomCells.Add(new TextCell("", TextAlignment.Left));
+            bottomCells.Add(TextCell.FromCurrency(_totalInitialValue));
+            bottomCells.Add(TextCell.FromCurrency(_totalActualValue));
+            bottomCells.Add(TextCell.FromCurrency(_totalGain));
+            bottomCells.Add(TextCell.FromPercentage(_totalPerformance));
+
+            TableContent = new TableContent(headers, GenerateCells(), bottomCells);
+        }
+
+        private List<List<ICellContent>> GenerateCells()
+        {
+            List<List<ICellContent>> cells = new();
+            foreach (PortFolioLineValue line in Values)
+            {
+                List<ICellContent> row = new();
+                row.Add(new TextCell(line.FundName, TextAlignment.Left));
+                row.Add(TextCell.FromDouble(line.Quantity));
+                row.Add(TextCell.FromCurrency(line.AverageValue));
+                row.Add(TextCell.FromCurrency(line.ActualValue));
+                row.Add(TextCell.FromCurrency(line.Gain));
+                row.Add(TextCell.FromPercentage(line.Evolution));
+                cells.Add(row);
+            }
+            return cells;
+        }
+
+        public void Sort(int index, HeaderSortState sortState)
+        {
+            if (sortState == HeaderSortState.Neutral)
+            {
+                Values.Sort(IDCompare);
+            }
+            else
+            {
+                Comparison<PortFolioLineValue> comparer = index switch
+                {
+                    0 => FundCompare(_headerState),
+                    1 => QuantityCompare(_headerState),
+                    2 => AverageValueCompare(_headerState),
+                    3 => ValueCompare(_headerState),
+                    4 => GainCompare(_headerState),
+                    5 => PerformanceCompare(_headerState),
+                    _ => throw new ArgumentException()
+                };
+                Values.Sort(comparer);
+            }
+            TableContent.Cells = GenerateCells();
         }
 
         public void SelectHeader(HeaderName newSelected)
