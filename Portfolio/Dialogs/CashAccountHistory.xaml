@@ -38,7 +38,7 @@
                 <x:String>Versement</x:String>
                 <x:String>Retrait</x:String>
             </ComboBox>
-            <TextBox Grid.Column="1" x:Name="Amount" PlaceholderText="Montant" TextChanged="Amount_TextChanged"/>
+            <TextBox Grid.Column="1" x:Name="AmountTextBox" PlaceholderText="Montant" TextChanged="AmountTextBox_TextChanged"/>
         </Grid>
         <StackPanel Orientation="Horizontal" Spacing="6">
         <DatePicker x:Name="DatePicker" SelectedDateChanged="DatePicker_SelectedDateChanged"/>

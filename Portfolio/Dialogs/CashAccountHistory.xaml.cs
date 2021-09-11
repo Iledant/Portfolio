@@ -62,7 +62,7 @@ namespace Portfolio.Dialogs
 
         private void ClearMovementPanel()
         {
-            Amount.Text = "";
+            AmountTextBox.Text = "";
             DatePicker.SelectedDate = null;
             TypeComboBox.SelectedItem = null;
             AddModifyButton.IsEnabled = false;
@@ -76,11 +76,11 @@ namespace Portfolio.Dialogs
             CheckIsAddModifyButtonEnabled();
         }
 
-        private void Amount_TextChanged(object _1, TextChangedEventArgs _2)
+        private void AmountTextBox_TextChanged(object _1, TextChangedEventArgs _2)
         {
             try
             {
-                _amount = double.Parse(Amount.Text, _ci.NumberFormat);
+                _amount = double.Parse(AmountTextBox.Text, _ci.NumberFormat);
             }
             catch
             {
@@ -114,7 +114,7 @@ namespace Portfolio.Dialogs
             _amount = _movement.Value;
             _type = _movement.Type();
             DatePicker.SelectedDate = _date;
-            Amount.Text = ((double)_amount).ToString("G");
+            AmountTextBox.Text = ((double)_amount).ToString("G");
             TypeComboBox.SelectedItem = _type;
             AddModifyButton.Content = _modifyIcon;
             DeleteButton.IsEnabled = true;
