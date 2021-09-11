@@ -309,9 +309,27 @@ namespace Portfolio.Repositories
             List<MonetaryAccount> accounts = new();
             while (reader.Read())
             {
-                accounts.Add(new(id: reader.GetInt32(0), name: reader.GetString(1),portfolioID: portfolioID,portfolioName:reader.GetString(2)));
+                accounts.Add(new(id: reader.GetInt32(0), name: reader.GetString(1), portfolioID: portfolioID, portfolioName: reader.GetString(2)));
             }
             return accounts;
+        }
+
+        public static List<CashAccountLine> GetCashAmountLines(int portfolioID)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            string selectQry = $"SELECT id,date,val,portfolio_line_id FROM cash_account_line WHERE portfolio_id = {portfolioID} ORDER BY 2";
+            using NpgsqlCommand? selectCmd = new(selectQry, con);
+            using NpgsqlDataReader? reader = selectCmd.ExecuteReader();
+            List<CashAccountLine> lines = new();
+            while (reader.Read())
+            {
+                lines.Add(new(id: reader.GetInt32(0),
+                    date: reader.GetDateTime(1),
+                    portfolioID: portfolioID,
+                    value: reader.GetDouble(2),
+                    portfolioLineID: Repository.ReadNullableInt(reader, 3)));
+            }
+            return lines;
         }
     }
 }
