@@ -133,6 +133,9 @@
     <Compile Include="Controls\TableControl.xaml.cs">
       <DependentUpon>TableControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\CashAccountHistory.xaml.cs">
+      <DependentUpon>CashAccountHistory.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\CompanyEditDialog.xaml.cs">
       <DependentUpon>CompanyEditDialog.xaml</DependentUpon>
     </Compile>
@@ -197,6 +200,7 @@
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\CashAccountRepository.cs" />
     <Compile Include="Repositories\CompanyRepository.cs" />
     <Compile Include="Repositories\DB.cs" />
     <Compile Include="Repositories\FundRepository.cs" />
@@ -204,6 +208,7 @@
     <Compile Include="Repositories\PortfolioRepository.cs" />
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="ViewModel\Bindable.cs" />
+    <Compile Include="ViewModel\CashAccountHistoryViewModel.cs" />
     <Compile Include="ViewModel\CompaniesViewModel.cs" />
     <Compile Include="ViewModel\Converters.cs" />
     <Compile Include="ViewModel\DBViewModel.cs" />
@@ -252,6 +257,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\TableControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\CashAccountHistory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
