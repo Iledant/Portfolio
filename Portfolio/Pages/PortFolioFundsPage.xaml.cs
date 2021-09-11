@@ -104,5 +104,12 @@ namespace Portfolio.Pages
                 ViewModel.Delete(_portfolio, line, _search);
             }
         }
+
+        private async void CashAccountHistoryButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            CashAccountHistory historyDialog = new(_portfolio.ID);
+
+            _ = await historyDialog.ShowAsync();
+        }
     }
 }

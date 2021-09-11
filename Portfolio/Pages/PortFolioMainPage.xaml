@@ -20,7 +20,7 @@
             IsSettingsVisible="False"
             SelectedItem="{x:Bind FundsNavViewItem}">
             <NavigationView.MenuItems>
-                <NavigationViewItem x:Name="FundsNavViewItem" Content="Fonds" Tag="Funds"/>
+                <NavigationViewItem x:Name="FundsNavViewItem" Content="Mouvements" Tag="Funds"/>
                 <NavigationViewItem Content="Performance" Tag="Performance" />
                 <NavigationViewItem Content="Historique" Tag="Historical"/>
                 <NavigationViewItem Content="Suivi des fonds" Tag="FundsLookUp"/>

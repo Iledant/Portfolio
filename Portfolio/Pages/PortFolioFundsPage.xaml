@@ -37,17 +37,18 @@
     </Page.Resources>
 
     <StackPanel Orientation="Vertical" Padding="12" Spacing="6">
-        <Grid ColumnSpacing="6">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,6">
             <Rectangle Fill="LightYellow" Grid.Column="0" Width="6"/>
-            <StackPanel Grid.Column="1" Spacing="3">
-                <TextBlock Text="Compte courant" />
-                <TextBlock Text="{x:Bind sys:String.Format('Montant : {0:c}', ViewModel.Cash)}" />
-            </StackPanel>
-        </Grid>
+            <TextBlock Text="Compte courant" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </StackPanel>
+        <TextBlock Text="{x:Bind sys:String.Format('Solde : {0:c}', ViewModel.Cash)}" Margin="12,0,0,0"/>
+        <Button Margin="12,0,0,0" x:Name="CashAccountHistoryButton" Click="CashAccountHistoryButton_Click">
+            Mouvements du compte
+        </Button>
+        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,12,0,6">
+            <Rectangle Fill="YellowGreen" Grid.Column="0" Width="6"/>
+            <TextBlock Text="Unités de compte" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </StackPanel>
         <Grid ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
