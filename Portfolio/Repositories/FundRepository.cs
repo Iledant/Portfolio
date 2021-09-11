@@ -234,12 +234,7 @@ namespace Portfolio.Repositories
                 HttpResponseMessage response = await _client.GetAsync(url);
                 string content = await response.Content.ReadAsStringAsync();
                 MorningStarPayloadRoot? root = JsonConvert.DeserializeObject<MorningStarPayloadRoot>(content);
-                if (root is null)
-                {
-                    throw new ArgumentNullException();
-                }
-
-                return root.TimeSeries.Security[0].HistoryDetail.ConvertAll<ParsedHistoryDetail>(e => new ParsedHistoryDetail(e));
+                return root?.TimeSeries?.Security?[0].HistoryDetail?.ConvertAll<ParsedHistoryDetail>(e => new ParsedHistoryDetail(e));
             }
             catch (Exception e)
             {
@@ -328,6 +323,10 @@ namespace Portfolio.Repositories
 
         public static async Task UpdateMorningstarHistorical(Fund fund)
         {
+            if (fund.MorningstarID is null)
+            {
+                throw new ArgumentNullException();
+            }
             NpgsqlConnection? con = DB.GetConnection();
 
             List<ParsedHistoryDetail>? historical = await GetMorningstarHistorical(fund.MorningstarID);
@@ -362,7 +361,7 @@ namespace Portfolio.Repositories
 
         public ParsedHistoryDetail(HistoryDetail h)
         {
-            if (h.EndDate.Length < 10)
+            if (h.EndDate is null || h.EndDate.Length < 10)
             {
                 throw new ArgumentException();
             }
@@ -375,23 +374,23 @@ namespace Portfolio.Repositories
 
     public class HistoryDetail
     {
-        public string EndDate { get; set; }
-        public string Value { get; set; }
+        public string? EndDate { get; set; }
+        public string? Value { get; set; }
     }
 
     public class Security
     {
-        public List<HistoryDetail> HistoryDetail { get; set; }
-        public string Id { get; set; }
+        public List<HistoryDetail>? HistoryDetail { get; set; }
+        public string? Id { get; set; }
     }
 
     public class TimeSeries
     {
-        public List<Security> Security { get; set; }
+        public List<Security>? Security { get; set; }
     }
 
     public class MorningStarPayloadRoot
     {
-        public TimeSeries TimeSeries { get; set; }
+        public TimeSeries? TimeSeries { get; set; }
     }
 }
