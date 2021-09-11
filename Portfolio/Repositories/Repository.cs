@@ -12,6 +12,11 @@ namespace Portfolio.Repositories
             return param is null ? DBNull.Value : param;
         }
 
+        public static object ConvertNullableIntParam(int? param)
+        {
+            return param is null ? DBNull.Value : param;
+        }
+
         public static string? ReadNullableString(NpgsqlDataReader reader, int pos)
         {
             return reader.IsDBNull(pos) ? null : reader.GetString(pos);
