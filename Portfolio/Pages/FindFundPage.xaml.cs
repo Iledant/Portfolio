@@ -105,7 +105,7 @@ namespace Portfolio.Pages
                 : Visibility.Collapsed;
             MorningstarOkStackPanel.Visibility = (state == DBState.OK) ? Visibility.Visible : Visibility.Collapsed;
             await Task.Delay(1);
-            await FundRepository.UpdateMorningstarHistorical(fund);
+            await FundRepository.UpdateMorningstarHistorical(new FundRepository.FundUpdateLine(fundID: fund.ID, morningstarID: fund.MorningstarID, firstDate: null));
         }
 
         private void HideMorningstarStackPanels()

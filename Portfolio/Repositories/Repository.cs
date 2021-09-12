@@ -26,5 +26,10 @@ namespace Portfolio.Repositories
         {
             return reader.IsDBNull(pos) ? null : reader.GetInt32(pos);
         }
+
+        public static DateTime? ReadNullableDateTime(NpgsqlDataReader reader, int pos)
+        {
+            return reader.IsDBNull(pos) ? null : reader.GetDateTime(pos);
+        }
     }
 }

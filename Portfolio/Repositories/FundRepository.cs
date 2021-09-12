@@ -17,6 +17,7 @@ namespace Portfolio.Repositories
     public static class FundRepository
     {
         private readonly static HttpClient _client = new();
+        private readonly static DateTime earliestMorningstarDate = new(1991,1,1);
 
         public static List<Fund> Get(string pattern)
         {
@@ -196,29 +197,20 @@ namespace Portfolio.Repositories
             _ = insertCmd.ExecuteNonQuery();
         }
 
-        private static List<Fund> GetNotNullMorningstarID(NpgsqlConnection? con)
+        private static List<FundUpdateLine> GetNotNullMorningstarID(NpgsqlConnection? con)
         {
-            string query = "SELECT f.id,f.morningstar_id FROM fund f " +
-                "WHERE morningstar_id IS NOT NULL";
+            string query = "SELECT f.id,f.morningstar_id,MIN(fd.date) FROM fund f " +
+                "LEFT JOIN fund_data fd ON fd.fund_id = f.id " +
+                "WHERE f.morningstar_id is not null " +
+                "GROUP BY 1,2";
             using NpgsqlCommand? cmd = new(query, con);
-            List<Fund> funds = new();
+            List<FundUpdateLine> lines = new();
             using NpgsqlDataReader? reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                funds.Add(new(id: reader.GetInt32(0), morningstarID: reader.GetString(1)));
+                lines.Add(new(fundID: reader.GetInt32(0), morningstarID: reader.GetString(1), firstDate: Repository.ReadNullableDateTime(reader, 2)));
             }
-            return funds;
-        }
-
-        public static async Task UpdateMorningstarHistorical()
-        {
-            NpgsqlConnection? con = DB.GetConnection();
-            List<Fund> funds = GetNotNullMorningstarID(con);
-
-            foreach (Fund fund in funds)
-            {
-                await UpdateMorningstarHistorical(fund);
-            }
+            return lines;
         }
 
         private static async Task<List<ParsedHistoryDetail>?> GetMorningstarHistorical(string morningstarID, DateTime? begin = null, DateTime? end = null)
@@ -303,7 +295,7 @@ namespace Portfolio.Repositories
                 "RETURNING id";
             using NpgsqlCommand? upsertCmd = new(upsertQuery, con);
             _ = upsertCmd.Parameters.AddWithValue("name", line.Name);
-            _ = upsertCmd.Parameters.AddWithValue("morningstar_id",line.MorningStarID);
+            _ = upsertCmd.Parameters.AddWithValue("morningstar_id", line.MorningStarID);
             _ = upsertCmd.Parameters.AddWithValue("company_id", companyID);
             try
             {
@@ -321,15 +313,43 @@ namespace Portfolio.Repositories
             return (fund, DBState.OK);
         }
 
-        public static async Task UpdateMorningstarHistorical(Fund fund)
+        public class FundUpdateLine
         {
-            if (fund.MorningstarID is null)
+            public int FundID;
+            public string MorningstarID;
+            public DateTime? FirstDate;
+
+            public FundUpdateLine(int fundID, string morningstarID, DateTime? firstDate)
             {
-                throw new ArgumentNullException();
+                FundID = fundID;
+                MorningstarID = morningstarID;
+                FirstDate = firstDate;
             }
+        }
+
+        public static async Task UpdateMorningstarHistorical()
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            List<FundUpdateLine> lines = GetNotNullMorningstarID(con);
+
+            foreach (FundUpdateLine line in lines)
+            {
+                await UpdateMorningstarHistorical(line);
+            }
+        }
+
+        public static async Task UpdateMorningstarHistorical(FundUpdateLine line)
+        {
             NpgsqlConnection? con = DB.GetConnection();
 
-            List<ParsedHistoryDetail>? historical = await GetMorningstarHistorical(fund.MorningstarID);
+            DateTime beginTime = line.FirstDate is null ? earliestMorningstarDate : (DateTime)line.FirstDate;
+            List<ParsedHistoryDetail>? historical = await GetMorningstarHistorical(line.MorningstarID, beginTime);
+
+            if (historical is null)
+            {
+                Log.AddLine($"Aucun historique pour l'ID morningstar {line.MorningstarID}");
+                return;
+            }
 
             using NpgsqlCommand? deleteCmd = new("DELETE FROM fund_data_import", con);
             _ = deleteCmd.ExecuteNonQuery();
@@ -348,7 +368,7 @@ namespace Portfolio.Repositories
                 "WHERE (@id,date) NOT IN " +
                 "  (SELECT fund_id,date FROM fund_data)";
             using NpgsqlCommand? insertCmd = new(updateQuery, con);
-            _ = insertCmd.Parameters.AddWithValue("id", fund.ID);
+            _ = insertCmd.Parameters.AddWithValue("id", line.FundID);
             _ = insertCmd.ExecuteNonQuery();
         }
     }
