@@ -55,16 +55,12 @@ namespace Portfolio.ViewModel
         private TableContent _tableContent;
 
         public List<PortFolioLineValue> Values { get; private set; } = new();
-        public double TotalInitialValue => _totalInitialValue;
-        public double TotalActualValue => _totalActualValue;
-        public double TotalGain => _totalGain;
-        public double TotalPerformance => _totalPerformance;
-        public HeaderSortState FundHeaderState => GetHeaderState(HeaderName.Fund);
-        public HeaderSortState QuantityHeaderState => GetHeaderState(HeaderName.Quantity);
-        public HeaderSortState AverageValueHeaderState => GetHeaderState(HeaderName.AverageValue);
-        public HeaderSortState ValueHeaderState => GetHeaderState(HeaderName.Value);
-        public HeaderSortState GainHeaderState => GetHeaderState(HeaderName.Gain);
-        public HeaderSortState PerformanceHeaderState => GetHeaderState(HeaderName.Performance);
+        //public HeaderSortState FundHeaderState => GetHeaderState(HeaderName.Fund);
+        //public HeaderSortState QuantityHeaderState => GetHeaderState(HeaderName.Quantity);
+        //public HeaderSortState AverageValueHeaderState => GetHeaderState(HeaderName.AverageValue);
+        //public HeaderSortState ValueHeaderState => GetHeaderState(HeaderName.Value);
+        //public HeaderSortState GainHeaderState => GetHeaderState(HeaderName.Gain);
+        //public HeaderSortState PerformanceHeaderState => GetHeaderState(HeaderName.Performance);
 
         public TableContent TableContent
         {
@@ -96,6 +92,9 @@ namespace Portfolio.ViewModel
             headers.Add(new TextCell("Valeur", TextAlignment.Center));
             headers.Add(new TextCell("Gain", TextAlignment.Center));
             headers.Add(new TextCell("Perf.", TextAlignment.Center));
+            headers.Add(new TextCell("sem.", TextAlignment.Center));
+            headers.Add(new TextCell("mois", TextAlignment.Center));
+            headers.Add(new TextCell("an", TextAlignment.Center));
 
             List<ICellContent> bottomCells = new();
             bottomCells.Add(new TextCell("Total", TextAlignment.Left));
@@ -104,6 +103,9 @@ namespace Portfolio.ViewModel
             bottomCells.Add(TextCell.FromCurrency(_totalActualValue));
             bottomCells.Add(TextCell.FromCurrency(_totalGain));
             bottomCells.Add(TextCell.FromPercentage(_totalPerformance));
+            bottomCells.Add(new TextCell("", TextAlignment.Left));
+            bottomCells.Add(new TextCell("", TextAlignment.Left));
+            bottomCells.Add(new TextCell("", TextAlignment.Left));
 
             TableContent = new TableContent(headers, GenerateCells(), bottomCells);
         }
@@ -120,6 +122,9 @@ namespace Portfolio.ViewModel
                 row.Add(TextCell.FromCurrency(line.ActualValue));
                 row.Add(TextCell.FromCurrency(line.Gain));
                 row.Add(TextCell.FromPercentage(line.Evolution));
+                row.Add(TextCell.FromPercentage(line.WeekGain));
+                row.Add(TextCell.FromPercentage(line.MonthGain));
+                row.Add(TextCell.FromPercentage(line.YearGain));
                 cells.Add(row);
             }
             return cells;
@@ -141,37 +146,14 @@ namespace Portfolio.ViewModel
                     3 => ValueCompare(_headerState),
                     4 => GainCompare(_headerState),
                     5 => PerformanceCompare(_headerState),
+                    6 => WeekGainCompare(_headerState),
+                    7 => MonthGainCompare(_headerState),
+                    8 => YearGainCompare(_headerState),
                     _ => throw new ArgumentException()
                 };
                 Values.Sort(comparer);
             }
             TableContent.Cells = GenerateCells();
-        }
-
-        public void SelectHeader(HeaderName newSelected)
-        {
-            if (newSelected != _selectedHeader)
-            {
-                HeaderName oldSelected = _selectedHeader;
-                _selectedHeader = newSelected;
-                _headerState = HeaderSortState.Ascending;
-                NotifyChange(oldSelected);
-                NotifyChange(newSelected);
-
-            }
-            else
-            {
-                _headerState = _headerState switch
-                {
-                    HeaderSortState.Ascending => HeaderSortState.Descending,
-                    HeaderSortState.Descending => HeaderSortState.Neutral,
-                    HeaderSortState.Neutral => HeaderSortState.Ascending,
-                    _ => throw new NotImplementedException()
-                };
-                NotifyChange(newSelected);
-            }
-
-            SortValues();
         }
 
         private static Comparison<PortFolioLineValue> FundCompare(HeaderSortState s)
@@ -212,48 +194,27 @@ namespace Portfolio.ViewModel
             return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.Evolution.CompareTo(b.Evolution);
         }
 
+        private static Comparison<PortFolioLineValue> WeekGainCompare(HeaderSortState s)
+        {
+            int sign = s == HeaderSortState.Ascending ? 1 : -1;
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.WeekGain.CompareTo(b.Evolution);
+        }
+
+        private static Comparison<PortFolioLineValue> MonthGainCompare(HeaderSortState s)
+        {
+            int sign = s == HeaderSortState.Ascending ? 1 : -1;
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.MonthGain.CompareTo(b.Evolution);
+        }
+
+        private static Comparison<PortFolioLineValue> YearGainCompare(HeaderSortState s)
+        {
+            int sign = s == HeaderSortState.Ascending ? 1 : -1;
+            return (PortFolioLineValue a, PortFolioLineValue b) => sign * a.YearGain.CompareTo(b.Evolution);
+        }
+
         private HeaderSortState GetHeaderState(HeaderName name)
         {
             return name == _selectedHeader ? _headerState : HeaderSortState.Neutral;
-        }
-
-        private void SortValues()
-        {
-            if (_headerState == HeaderSortState.Neutral)
-            {
-                Values.Sort(IDCompare);
-                return;
-            }
-
-            Comparison<PortFolioLineValue> comparer = _selectedHeader switch
-            {
-                HeaderName.None => IDCompare,
-                HeaderName.Fund => FundCompare(_headerState),
-                HeaderName.Quantity => QuantityCompare(_headerState),
-                HeaderName.AverageValue => AverageValueCompare(_headerState),
-                HeaderName.Value => ValueCompare(_headerState),
-                HeaderName.Gain => GainCompare(_headerState),
-                HeaderName.Performance => PerformanceCompare(_headerState),
-                _ => throw new ArgumentException()
-            };
-
-            Values.Sort(comparer);
-        }
-
-        private void NotifyChange(HeaderName name)
-        {
-            string propertyName = name switch
-            {
-                HeaderName.None => null,
-                HeaderName.Fund => nameof(FundHeaderState),
-                HeaderName.Quantity => nameof(QuantityHeaderState),
-                HeaderName.AverageValue => nameof(AverageValueHeaderState),
-                HeaderName.Value => nameof(ValueHeaderState),
-                HeaderName.Gain => nameof(GainHeaderState),
-                HeaderName.Performance => nameof(PerformanceHeaderState),
-                _ => throw new ArgumentException()
-            };
-            OnPropertyChanged(propertyName);
         }
     }
 }

@@ -16,8 +16,11 @@ namespace Portfolio.Repositories
         public double AverageValue;
         public double Evolution;
         public double Gain;
+        public double WeekGain;
+        public double MonthGain;
+        public double YearGain;
 
-        public PortFolioLineValue(int fundID = 0, string fundName = "", double actualValue = 0, double quantity = 0, double averageValue = 0)
+        public PortFolioLineValue(int fundID = 0, string fundName = "", double actualValue = 0, double quantity = 0, double averageValue = 0, double weekGain = 0, double monthGain = 0, double yearGain = 0)
         {
             FundID = fundID;
             FundName = fundName;
@@ -26,6 +29,9 @@ namespace Portfolio.Repositories
             AverageValue = averageValue;
             Evolution = averageValue != 0 ? actualValue / averageValue - 1.0 : 0;
             Gain = (ActualValue - AverageValue) * Quantity;
+            WeekGain = weekGain;
+            MonthGain = monthGain;
+            YearGain = yearGain;
         }
     }
 
@@ -191,6 +197,8 @@ namespace Portfolio.Repositories
                 }
             }
 
+            List<FundLookUp> lookUps = GetFundLookUps(portfolioID);
+
             string nameAndActualValueQuery = "SELECT DISTINCT f.id,f.name,fd.val FROM fund f " +
                 "JOIN portfolio_line pf ON pf.fund_id = f.id " +
                 "JOIN(SELECT fund_id, max(date) FROM fund_data GROUP BY 1 ORDER BY 1) av ON av.fund_id = f.id " +
@@ -198,8 +206,8 @@ namespace Portfolio.Repositories
                 "WHERE pf.portfolio_id = @portfolio_id ORDER BY 1";
             using (NpgsqlCommand? cmd = new(nameAndActualValueQuery, con))
             {
-                cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
-                using var reader = cmd.ExecuteReader();
+                _ = cmd.Parameters.AddWithValue("portfolio_id", portfolioID);
+                using NpgsqlDataReader? reader = cmd.ExecuteReader();
                 int i = 0;
                 while (reader.Read())
                 {
@@ -211,6 +219,9 @@ namespace Portfolio.Repositories
                         line.ActualValue = reader.GetDouble(2);
                         line.Gain = line.Quantity * (line.ActualValue - line.AverageValue);
                         line.Evolution = line.ActualValue / line.AverageValue - 1;
+                        line.WeekGain = lookUps[i].WeekPerformance;
+                        line.MonthGain = lookUps[i].MonthPerformance;
+                        line.YearGain = lookUps[i].YearPerformance;
                     }
                     else
                     {
@@ -222,43 +233,12 @@ namespace Portfolio.Repositories
             return fundPerfs;
         }
 
-        public static List<FundData> GetHistorical(int portfolioID, DateTime? begin = null, DateTime? end = null)
-        {
-            NpgsqlConnection? con = DB.GetConnection();
-            string query = "WITH fond_list AS (SELECT id FROM portfolio_line WHERE portfolio_id=1), " +
-                "date_fund_list AS (SELECT id, fund_id, quantity, date " +
-                "   FROM portfolio_line WHERE date is NOT null and average_val is null), " +
-                "avg_fund_list AS (SELECT id, fund_id, average_val " +
-                "   FROM portfolio_line WHERE average_val is NOT null), " +
-                "cal_avg_fund_list AS (SELECT pl.id,pl.fund_id,fd.val AS average_val " +
-                "   FROM date_fund_list pl JOIN fund_data fd ON pl.fund_id = fd.fund_id AND pl.date = fd.date), " +
-                $"date_limits AS (SELECT min(date) AS min,max(date) AS max " +
-                $"  FROM fund_data WHERE fund_id IN (SELECT fund_id FROM portfolio WHERE id = {portfolioID})) " +
-                "SELECT fd.date,sum(fd.val * pl.quantity) " +
-                "FROM portfolio_line pl " +
-                "JOIN fund f ON pl.fund_id = f.id " +
-                "JOIN fund_data fd ON fd.fund_id = f.id " +
-                "WHERE pl.portfolio_id = 1 AND fd.date >= (SELECT min FROM date_limits) " +
-                "   AND fd.date <= (SELECT max FROM date_limits) AND fd.date >= @begin AND fd.date <= @end " +
-                "GROUP BY 1 ORDER BY 1";
-            using NpgsqlCommand? cmd = new(query, con);
-            _ = cmd.Parameters.AddWithValue("begin", begin ?? DateTime.MinValue);
-            _ = cmd.Parameters.AddWithValue("end", end ?? DateTime.MaxValue);
-            List<FundData> lines = new();
-            using NpgsqlDataReader? reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                lines.Add(new(id: 0, fundId: 0, date: reader.GetDateTime(0), val: reader.GetDouble(1)));
-            }
-            return lines;
-        }
-
-        public static List<FundLookUp> GetFundLookUps(int portfolioID)
+        private static List<FundLookUp> GetFundLookUps(int portfolioID)
         {
             NpgsqlConnection? con = DB.GetConnection();
             List<FundLookUp> funds = new();
 
-            string query = "WITH funds AS (SELECT DISTINCT f.id,f.name FROM fund f " +
+            string query = "WITH funds AS (SELECT DISTINCT f.id FROM fund f " +
                 "JOIN portfolio_line pl ON pl.fund_id = f.id " +
                 $"WHERE pl.portfolio_id = {portfolioID}), " +
                 "last_val AS(SELECT fund_id, max(date) FROM fund_data GROUP BY 1 ORDER BY 1), " +
@@ -271,7 +251,7 @@ namespace Portfolio.Repositories
                 "fd_d365 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '365'), " +
                 "fd_d366 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '366'), " +
                 "fd_d367 AS(SELECT fund_id, val FROM fund_data WHERE date = current_date - integer '367') " +
-                "SELECT f.id,f.name,fd.val,COALESCE(fd_d7.val, fd_d8.val, fd_d9.val)," +
+                "SELECT f.id,fd.val,COALESCE(fd_d7.val, fd_d8.val, fd_d9.val)," +
                     "COALESCE(fd_d31.val, fd_d32.val, fd_d33.val)," +
                     "COALESCE(fd_d365.val, fd_d366.val, fd_d367.val) FROM funds f " +
                 "JOIN last_val ON last_val.fund_id = f.id " +
@@ -290,11 +270,10 @@ namespace Portfolio.Repositories
             while (reader.Read())
             {
                 funds.Add(new(fundID: reader.GetInt32(0),
-                    fundName: reader.GetString(1),
-                    actualValue: reader.GetDouble(2),
-                    lastWeekValue: reader.GetDouble(3),
-                    lastMonthValue: reader.GetDouble(4),
-                    lastYearValue: reader.GetDouble(5)));
+                    actualValue: reader.GetDouble(1),
+                    lastWeekValue: reader.GetDouble(2),
+                    lastMonthValue: reader.GetDouble(3),
+                    lastYearValue: reader.GetDouble(4))); ;
             }
             return funds;
         }

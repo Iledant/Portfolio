@@ -34,8 +34,6 @@ namespace Portfolio.Pages
             {
                 "Funds" => contentFrame.Navigate(typeof(PortFolioFundsPage), _portfolio),
                 "Performance" => contentFrame.Navigate(typeof(PortFolioPerformancePage), _portfolio),
-                "Historical" => contentFrame.Navigate(typeof(PortFolioHistoricalPage), _portfolio),
-                "FundsLookUp" => contentFrame.Navigate(typeof(PortFolioFundsLookUp), _portfolio),
                 _ => throw new NotImplementedException(),
             };
         }

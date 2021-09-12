@@ -3,7 +3,6 @@
     public class FundLookUp
     {
         public readonly int FundID;
-        public readonly string FundName;
         public readonly double ActualValue;
         public readonly double LastWeekValue;
         public readonly double WeekPerformance;
@@ -12,10 +11,9 @@
         public readonly double LastYearValue;
         public readonly double YearPerformance;
 
-        public FundLookUp(int fundID = 0, string fundName = "", double actualValue = 0, double lastWeekValue = 0, double lastMonthValue = 0, double lastYearValue = 0)
+        public FundLookUp(int fundID = 0, double actualValue = 0, double lastWeekValue = 0, double lastMonthValue = 0, double lastYearValue = 0)
         {
             FundID = fundID;
-            FundName = fundName;
             ActualValue = actualValue;
             LastWeekValue = lastWeekValue;
             LastMonthValue = lastMonthValue;

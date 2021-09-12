@@ -40,10 +40,5 @@ namespace Portfolio.ViewModel
                 OnPropertyChanged(nameof(Values));
             }
         }
-
-        public void FetchValues(PortFolio portFolio, DateTime? begin = null, DateTime? end = null)
-        {
-            Values = PortfolioRepository.GetHistorical(portFolio.ID, begin, end);
-        }
     }
 }

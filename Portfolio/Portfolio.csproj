@@ -175,17 +175,11 @@
     <Compile Include="Pages\FundChartPage.xaml.cs">
       <DependentUpon>FundChartPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\PortFolioFundsLookUp.xaml.cs">
-      <DependentUpon>PortFolioFundsLookUp.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\PortFolioMainPage.xaml.cs">
       <DependentUpon>PortFolioMainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\FundsPage.xaml.cs">
       <DependentUpon>FundsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PortFolioHistoricalPage.xaml.cs">
-      <DependentUpon>PortFolioHistoricalPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PortFolioFundsPage.xaml.cs">
       <DependentUpon>PortFolioFundsPage.xaml</DependentUpon>
@@ -213,14 +207,12 @@
     <Compile Include="ViewModel\Converters.cs" />
     <Compile Include="ViewModel\DBViewModel.cs" />
     <Compile Include="ViewModel\AverageChartViewModel.cs" />
-    <Compile Include="ViewModel\FundsLookUpViewModel.cs" />
     <Compile Include="ViewModel\FundsViewModel.cs" />
     <Compile Include="ViewModel\FundViewModel.cs" />
     <Compile Include="ViewModel\LogViewModel.cs" />
-    <Compile Include="ViewModel\PortfolioHistoricalViewModel.cs" />
-    <Compile Include="ViewModel\PortfolioPerformanceViewModel.cs" />
     <Compile Include="ViewModel\APIFinanceViewModel.cs" />
     <Compile Include="ViewModel\PortFolioLineViewModel.cs" />
+    <Compile Include="ViewModel\PortfolioPerformanceViewModel.cs" />
     <Compile Include="ViewModel\PortFoliosViewModel.cs" />
     <Compile Include="ViewModel\PortFolioViewModel.cs" />
   </ItemGroup>
@@ -300,19 +292,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\PortFolioFundsLookUp.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Pages\PortFolioMainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\FundsPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PortFolioHistoricalPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

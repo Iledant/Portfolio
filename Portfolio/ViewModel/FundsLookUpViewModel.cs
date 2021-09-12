@@ -29,12 +29,5 @@ namespace Portfolio.ViewModel
             }
         }
 
-        public void FetchFunds()
-        {
-            if (_portfolio is not null)
-            {
-                Funds = PortfolioRepository.GetFundLookUps(_portfolio.ID);
-            }
-        }
     }
 }
