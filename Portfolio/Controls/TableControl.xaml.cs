@@ -193,7 +193,7 @@ namespace Portfolio.Controls
             if (ptr.PointerDeviceType == PointerDeviceType.Mouse)
             {
                 PointerPoint point = e.GetCurrentPoint(Table);
-                if ((point.Position.Y < _headerHeight || point.Position.Y > _headerAndCellHeight))
+                if (point.Position.Y < _headerHeight || point.Position.Y > _headerAndCellHeight)
                 {
                     if (_pointeredRow != 0)
                     {
@@ -209,9 +209,9 @@ namespace Portfolio.Controls
                         ClearPointeredRow();
                         if (row > 0)
                         {
-                            for (int i = 0; i < 6; i++)
+                            for (int i = 0; i < TableContent.Headers.Count; i++)
                             {
-                                Border border = (Border)(Table.Children[6 * row + i]);
+                                Border border = (Border)Table.Children[TableContent.Headers.Count * row + i];
                                 border.Background = PointeredCellBackground;
                             }
                             _pointeredRow = row;
@@ -377,9 +377,9 @@ namespace Portfolio.Controls
                 return;
             }
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < TableContent.Headers.Count; i++)
             {
-                ((Border)Table.Children[6 * _pointeredRow + i]).Background = CellBackground;
+                ((Border)Table.Children[TableContent.Headers.Count * _pointeredRow + i]).Background = CellBackground;
             }
         }
         #endregion
