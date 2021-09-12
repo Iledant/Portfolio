@@ -111,5 +111,10 @@ namespace Portfolio.Pages
 
             _ = await historyDialog.ShowAsync();
         }
+
+        private void MonetayAccountHistoryButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+
+        }
     }
 }

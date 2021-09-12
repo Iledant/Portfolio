@@ -37,35 +37,46 @@
     </Page.Resources>
 
     <StackPanel Orientation="Vertical" Padding="12" Spacing="6">
-        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,6">
-            <Rectangle Fill="LightYellow" Grid.Column="0" Width="6"/>
-            <TextBlock Text="Compte courant" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-        </StackPanel>
-        <TextBlock Text="{x:Bind sys:String.Format('Solde : {0:c}', ViewModel.Cash)}" Margin="12,0,0,0"/>
-        <Button Margin="12,0,0,0" x:Name="CashAccountHistoryButton" Click="CashAccountHistoryButton_Click">
-            Mouvements du compte
-        </Button>
-        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,12,0,6">
-            <Rectangle Fill="YellowGreen" Grid.Column="0" Width="6"/>
-            <TextBlock Text="Unités de compte" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-        </StackPanel>
-        <Grid ColumnSpacing="12">
+        <Grid RowSpacing="6">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" x:Name="AddButton" Click="AddButton_Click">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Rectangle Grid.Column="0" Grid.RowSpan="2" Fill="LightYellow" Width="12" Margin="0,0,12,0"/>
+            <TextBlock Grid.Column="1" Grid.Row="0" Text="Compte espèces" Style="{ThemeResource SubtitleTextBlockStyle}" />
+            <TextBlock Grid.Column="2" Grid.Row="0" Text="{x:Bind sys:String.Format('Solde : {0:c}', ViewModel.Cash)}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+            <Button Grid.Column="2" Grid.Row="1" Margin="12,0,0,0" x:Name="CashAccountHistoryButton" Click="CashAccountHistoryButton_Click">
+                Mouvements...
+            </Button>
+            <Rectangle Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Fill="Yellow" Width="12" Margin="0,0,12,0"/>
+            <TextBlock Grid.Column="1" Grid.Row="2" Text="Fonds monétaires" Style="{ThemeResource SubtitleTextBlockStyle}" />
+            <TextBlock Grid.Column="2" Grid.Row="2" Text="{x:Bind sys:String.Format('Solde : {0:c}', ViewModel.Cash)}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+            <Button Grid.Column="2" Grid.Row="3" Margin="12,0,0,0" x:Name="MonetaryAccountHistoryButton" Click="MonetayAccountHistoryButton_Click">
+                Mouvements...
+            </Button>
+            <Rectangle Grid.Row="4" Grid.RowSpan="2" Fill="YellowGreen" Grid.Column="0" Width="12" Margin="0,0,12,0"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="Unités de compte" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+            <local:DebounceSearch Grid.Row="4" Grid.Column="3" x:Name="Search" TextChanged="Search_TextChanged" Margin="12,0,0,0"/>
+            <Button Grid.Row="5" Grid.Column="3"  x:Name="AddButton" Click="AddButton_Click" Margin="12,0,0,0">
                 <Button.KeyboardAccelerators>
                     <KeyboardAccelerator Key="Add" Modifiers="Control" />
                 </Button.KeyboardAccelerators>
                 Ajouter
             </Button>
-            <local:DebounceSearch Grid.Column="1" x:Name="Search" TextChanged="Search_TextChanged" />
         </Grid>
         <GridView 
             x:Name="ListView"
             ItemsSource="{x:Bind ViewModel.Lines, Mode=OneWay}"
-            Margin="0,20,0,0"
+            Margin="12,20,0,0"
             IsDoubleTapEnabled="True"
             DoubleTapped="ListView_DoubleTapped">
             <GridView.KeyboardAccelerators>
@@ -76,7 +87,7 @@
                 <DataTemplate x:DataType="local1:PortFolioLine">
                     <UserControl>
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <Rectangle Fill="YellowGreen" Grid.Column="0" Width="6"/>
+                            <Rectangle Fill="YellowGreen" Grid.Column="0" Width="3"/>
                             <StackPanel Orientation="Vertical" Grid.Column="1">
                                 <TextBlock Text="Fond"/>
                                 <TextBlock Text="Quantité"/>
