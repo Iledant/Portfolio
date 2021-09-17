@@ -85,9 +85,7 @@ namespace Portfolio.Repositories
                     _ = cmd.Parameters.AddWithValue("name", portfolio.Name);
                     _ = cmd.Parameters.AddWithValue("comment",
                         Repository.ConvertNullableStringParam(portfolio.Comment));
-                    using NpgsqlDataReader? reader = cmd.ExecuteReader();
-                    reader.Read();
-                    portfolioID = reader.GetInt32(0);
+                    portfolioID = (int)cmd.ExecuteScalar();
                 }
 
                 string insertNullLineCashAccountQry = $"INSERT INTO cash_account_line (portfolio_id,date,val) VALUES({portfolioID},now(),0)";

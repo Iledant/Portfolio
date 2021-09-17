@@ -271,9 +271,7 @@ namespace Portfolio.Repositories
             _ = cmd.Parameters.AddWithValue("company_id", companyID);
             try
             {
-                using NpgsqlDataReader? reader = cmd.ExecuteReader();
-                _ = reader.Read();
-                id = reader.GetInt32(0);
+                id = (int) cmd.ExecuteScalar();
             }
             catch (PostgresException exception)
             {
@@ -299,9 +297,7 @@ namespace Portfolio.Repositories
             _ = upsertCmd.Parameters.AddWithValue("company_id", companyID);
             try
             {
-                using NpgsqlDataReader? reader = upsertCmd.ExecuteReader();
-                _ = reader.Read();
-                id = reader.GetInt32(0);
+                id = (int)upsertCmd.ExecuteScalar();
             }
             catch (PostgresException exception)
             {

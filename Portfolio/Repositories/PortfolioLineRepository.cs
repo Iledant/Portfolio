@@ -78,9 +78,7 @@ namespace Portfolio.Repositories
             string getCashQry = $"SELECT sum(val) FROM cash_account_line WHERE portfolio_id={portfolio.ID}";
             using (NpgsqlCommand? cmd = new(getCashQry, con))
             {
-                using NpgsqlDataReader? reader = cmd.ExecuteReader();
-                _ = reader.Read();
-                cash = reader.GetDouble(0);
+                cash = (double)cmd.ExecuteScalar();
             }
             return (lines, cash);
         }
