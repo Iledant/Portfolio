@@ -25,9 +25,12 @@ namespace Portfolio.Pages
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter is PortFolio and not null)
+            if (e.Parameter is PortFolio)
             {
                 _portfolio = e.Parameter as PortFolio;
+                ViewModel.Fetch(_portfolio, "");
+                ViewModel.FetchCash(_portfolio);
+                ViewModel.FetchMonetaryAccountBalances(_portfolio);
             }
             base.OnNavigatedTo(e);
         }
@@ -68,11 +71,6 @@ namespace Portfolio.Pages
             {
                 ViewModel.Fetch(_portfolio, _search);
             }
-        }
-
-        private void Page_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            ViewModel.Fetch(_portfolio, "");
         }
 
         private void ListView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)

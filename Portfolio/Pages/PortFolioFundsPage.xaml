@@ -6,10 +6,10 @@
     xmlns:local="using:Portfolio.Pages"
     xmlns:local1="using:Portfolio.Models"
     xmlns:local2="using:Portfolio.ViewModel"
+    xmlns:local3="using:Portfolio.Repositories"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Loaded="Page_Loaded"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
@@ -36,48 +36,72 @@
         </XamlUICommand>
     </Page.Resources>
 
-    <StackPanel Orientation="Vertical" Padding="12" Spacing="6">
-        <Grid RowSpacing="6">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Rectangle Grid.Column="0" Grid.RowSpan="2" Fill="LightYellow" Width="12" Margin="0,0,12,0"/>
-            <TextBlock Grid.Column="1" Grid.Row="0" Text="Compte espèces" Style="{ThemeResource SubtitleTextBlockStyle}" />
-            <TextBlock Grid.Column="2" Grid.Row="0" Text="{x:Bind sys:String.Format('Solde : {0:c}', ViewModel.Cash)}" Margin="12,0,0,0" VerticalAlignment="Center"/>
-            <Button Grid.Column="2" Grid.Row="1" Margin="12,0,0,0" x:Name="CashAccountHistoryButton" Click="CashAccountHistoryButton_Click">
-                Mouvements...
-            </Button>
-            <Rectangle Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Fill="Yellow" Width="12" Margin="0,0,12,0"/>
-            <TextBlock Grid.Column="1" Grid.Row="2" Text="Fonds monétaires" Style="{ThemeResource SubtitleTextBlockStyle}" />
-            <TextBlock Grid.Column="2" Grid.Row="2" Text="{x:Bind sys:String.Format('Solde : {0:c}', ViewModel.Cash)}" Margin="12,0,0,0" VerticalAlignment="Center"/>
-            <Button Grid.Column="2" Grid.Row="3" Margin="12,0,0,0" x:Name="MonetaryAccountHistoryButton" Click="MonetayAccountHistoryButton_Click">
-                Mouvements...
-            </Button>
-            <Rectangle Grid.Row="4" Grid.RowSpan="2" Fill="YellowGreen" Grid.Column="0" Width="12" Margin="0,0,12,0"/>
-            <TextBlock Grid.Row="4" Grid.Column="1" Text="Unités de compte" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-            <local:DebounceSearch Grid.Row="4" Grid.Column="3" x:Name="Search" TextChanged="Search_TextChanged" Margin="12,0,0,0"/>
-            <Button Grid.Row="5" Grid.Column="3"  x:Name="AddButton" Click="AddButton_Click" Margin="12,0,0,0">
-                <Button.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="Add" Modifiers="Control" />
-                </Button.KeyboardAccelerators>
-                Ajouter
-            </Button>
-        </Grid>
+    <Grid RowSpacing="12" ColumnSpacing="6" Padding="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Rectangle Grid.Column="0" Grid.RowSpan="2" Fill="LightYellow" Width="6" />
+        <TextBlock Grid.Column="1" Grid.Row="0" Text="Compte espèces" Style="{ThemeResource SubtitleTextBlockStyle}" />
+        <TextBlock Grid.Column="1" Grid.Row="1" Text="{x:Bind sys:String.Format('Solde : {0:c}', ViewModel.Cash)}" Margin="6,0,0,0" VerticalAlignment="Center"/>
+        <Button Grid.Column="2" Grid.Row="0" x:Name="CashAccountHistoryButton" Click="CashAccountHistoryButton_Click" HorizontalAlignment="Right" Padding="0"  ToolTipService.ToolTip="Mouvements">
+            <SymbolIcon Symbol="Switch" />
+        </Button>
+        <Rectangle Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Fill="Yellow" Width="6" />
+        <TextBlock Grid.Column="1" Grid.Row="2" Text="Fonds monétaires" Style="{ThemeResource SubtitleTextBlockStyle}" />
+        <Button Grid.Column="2" Grid.Row="2" x:Name="MonetaryAccountHistoryButton" Click="MonetayAccountHistoryButton_Click" HorizontalAlignment="Right" Padding="0" ToolTipService.ToolTip="Ajouter">
+            <SymbolIcon Symbol="Add"/>
+        </Button>
+        <GridView Grid.Row="3" Grid.ColumnSpan="3" Grid.Column="1" x:Name="MonetaryList" ItemsSource="{x:Bind ViewModel.MonetaryAccountBalances}">
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local3:MonetaryAccountBalance">
+                    <Grid ColumnSpacing="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Rectangle Fill="Yellow" Width="3" Grid.Column="0"/>
+                        <TextBlock Text="Nom du fond" Grid.Column="1" Grid.Row="0" />
+                        <TextBlock Text="Montant" Grid.Column="1" Grid.Row="1" />
+                        <TextBlock Text="{x:Bind Name}" Grid.Column="2" Grid.Row="0" />
+                        <TextBlock Text="{x:Bind sys:String.Format('{0:c}', Balance)}" Grid.Column="2" Grid.Row="1" />
+                    </Grid>
+                </DataTemplate>
+            </GridView.ItemTemplate>    
+        </GridView>
+        <Rectangle Grid.Row="4" Grid.RowSpan="2" Fill="YellowGreen" Grid.Column="0" Width="6" />
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="Unités de compte" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        <local:DebounceSearch Grid.Row="4" Grid.Column="3" x:Name="Search" TextChanged="Search_TextChanged" />
+        <Button Grid.Row="4" Grid.Column="2" x:Name="AddButton" Click="AddButton_Click" HorizontalAlignment="Right" Padding="0" ToolTipService.ToolTip="Ajouter">
+            <Button.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Add" Modifiers="Control" />
+            </Button.KeyboardAccelerators>
+            <SymbolIcon Symbol="Add"/>
+        </Button>
         <GridView 
             x:Name="ListView"
             ItemsSource="{x:Bind ViewModel.Lines, Mode=OneWay}"
-            Margin="12,20,0,0"
+            Margin="0,20,0,0"
             IsDoubleTapEnabled="True"
+            Grid.Column="1"
+            Grid.ColumnSpan="3"
+            Grid.Row="5"
             DoubleTapped="ListView_DoubleTapped">
             <GridView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteKeyInvoked">
@@ -105,16 +129,16 @@
                         <UserControl.ContextFlyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem 
-                                    Command="{StaticResource UIRemoveCommand}" 
-                                    CommandParameter="{x:Bind }"/>
+                                Command="{StaticResource UIRemoveCommand}" 
+                                CommandParameter="{x:Bind }"/>
                                 <MenuFlyoutItem 
-                                    Command="{StaticResource UIModifyCommand}" 
-                                    CommandParameter="{x:Bind }"/>
+                                Command="{StaticResource UIModifyCommand}" 
+                                CommandParameter="{x:Bind }"/>
                             </MenuFlyout>
                         </UserControl.ContextFlyout>
                     </UserControl>
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
-    </StackPanel>
+    </Grid>
 </Page>

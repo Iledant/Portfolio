@@ -198,6 +198,7 @@
     <Compile Include="Repositories\CompanyRepository.cs" />
     <Compile Include="Repositories\DB.cs" />
     <Compile Include="Repositories\FundRepository.cs" />
+    <Compile Include="Repositories\MonetaryAccountRepository.cs" />
     <Compile Include="Repositories\PortfolioLineRepository.cs" />
     <Compile Include="Repositories\PortfolioRepository.cs" />
     <Compile Include="Repositories\Repository.cs" />
