@@ -40,7 +40,7 @@ namespace Portfolio.Repositories
             return lines;
         }
 
-        public static (List<PortFolioLine>, double) GetFromPortFolio(PortFolio portfolio, string pattern)
+        public static List<PortFolioLine> GetFromPortFolio(PortFolio portfolio, string pattern)
         {
             NpgsqlConnection? con = DB.GetConnection();
             string getLinesQry = "SELECT l.id,l.date,l.fund_id,f.name,l.quantity,l.purchase_val,l.portfolio_id,c.id,c.name,l.account_id " +
@@ -51,7 +51,6 @@ namespace Portfolio.Repositories
                 "WHERE f.name ILIKE '%' || unaccent(@pattern) || '%' " +
                 $"OR c.name ILIKE '%' || unaccent(@pattern) || '%' AND p.id=@id ORDER BY 1";
             List<PortFolioLine> lines = new();
-            double cash = 0;
             using (NpgsqlCommand? cmd = new(getLinesQry, con))
             {
                 _ = cmd.Parameters.AddWithValue("pattern", pattern);
@@ -74,13 +73,15 @@ namespace Portfolio.Repositories
                         );
                 }
             }
+            return lines;
+        }
 
+        public static double GetCashFromPortfolio(PortFolio portfolio)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
             string getCashQry = $"SELECT sum(val) FROM cash_account_line WHERE portfolio_id={portfolio.ID}";
-            using (NpgsqlCommand? cmd = new(getCashQry, con))
-            {
-                cash = (double)cmd.ExecuteScalar();
-            }
-            return (lines, cash);
+            using NpgsqlCommand? cmd = new(getCashQry, con);
+            return (double)cmd.ExecuteScalar();
         }
 
         private static DBState CheckQuantity(NpgsqlConnection? con, PortFolioLine portfolioLine)

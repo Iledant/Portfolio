@@ -9,6 +9,7 @@ namespace Portfolio.ViewModel
     {
         private List<PortFolioLine> _lines;
         private double _cash;
+        private List<MonetaryAccountBalance> _monetaryAccountBalances;
 
         public List<PortFolioLine> Lines
         {
@@ -30,10 +31,29 @@ namespace Portfolio.ViewModel
             }
         }
 
+        public List<MonetaryAccountBalance> MonetaryAccountBalances
+        {
+            get => _monetaryAccountBalances;
+            set
+            {
+                _monetaryAccountBalances = value;
+                OnPropertyChanged(nameof(MonetaryAccountBalances));
+            }
+        }
+
         public void Fetch(PortFolio portfolio, string pattern)
         {
-            (Lines, Cash) = PortfolioLineRepository.GetFromPortFolio(portfolio, pattern);
+            Lines = PortfolioLineRepository.GetFromPortFolio(portfolio, pattern);
+        }
 
+        public void FetchMonetaryAccountBalances(PortFolio portfolio)
+        {
+            MonetaryAccountBalances = MonetaryAccountRepository.GetBalancesFromPortfolio(portfolio.ID);
+        }
+
+        public void FetchCash(PortFolio portFolio)
+        {
+            Cash = PortfolioLineRepository.GetCashFromPortfolio(portFolio);
         }
 
         public void Delete(PortFolio portfolio, PortFolioLine line, string pattern)
