@@ -30,8 +30,8 @@ namespace Portfolio.Repositories
         {
             List<MonetaryAccountBalance> lines = new();
             NpgsqlConnection? con = DB.GetConnection();
-            string getBalancesQry = "SELECT ma.id,ma.name,line.val FROM monetary_account ma " +
-                "JOIN (SELECT SUM(val) AS val, account_id FROM monetary_account_line " +
+            string getBalancesQry = "SELECT ma.id,ma.name,COALESCE(line.val,0) FROM monetary_account ma " +
+                "LEFT JOIN (SELECT SUM(val) AS val, account_id FROM monetary_account_line " +
                 "   GROUP BY 2 ORDER BY 2) line ON line.account_id = ma.id " +
                 $"WHERE ma.portfolio_id = {portfolioId};";
             using NpgsqlCommand? cmd = new(getBalancesQry, con);
@@ -67,6 +67,21 @@ namespace Portfolio.Repositories
             using NpgsqlCommand? cmd = new(insertQry, con);
             _ = cmd.Parameters.AddWithValue("name", account.Name);
             _ = cmd.Parameters.AddWithValue("portfolio_id", account.PortfolioID);
+            try
+            {
+                _ = cmd.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+                DB.State = DBState.Error;
+            }
+        }
+
+        public static void Delete(MonetaryAccount account)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            string insertQry = $"DELETE FROM monetary_account WHERE id={account.ID}";
+            using NpgsqlCommand? cmd = new(insertQry, con);
             try
             {
                 _ = cmd.ExecuteNonQuery();

@@ -2,6 +2,7 @@
 using Portfolio.Models;
 using Portfolio.ViewModel;
 using System;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
@@ -50,7 +51,7 @@ namespace Portfolio.Pages
             ShowDeleteDialogAndHandle(args.Parameter as PortFolioLine);
         }
 
-        private void AddButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private void AddButton_Click(object _1, RoutedEventArgs _2)
         {
             ShowDialogAndUpdate(new PortFolioLineEditDialog(new PortFolioLine(portFolioID: _portfolio.ID)));
         }
@@ -73,7 +74,7 @@ namespace Portfolio.Pages
             }
         }
 
-        private void ListView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        private void ListView_DoubleTapped(object _1, DoubleTappedRoutedEventArgs _2)
         {
             if (ListView.SelectedItem is not null)
             {
@@ -82,7 +83,7 @@ namespace Portfolio.Pages
             }
         }
 
-        private void DeleteKeyInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        private void DeleteKeyInvoked(KeyboardAccelerator _1, KeyboardAcceleratorInvokedEventArgs args)
         {
             if (ListView.SelectedItem is not null)
             {
@@ -96,23 +97,63 @@ namespace Portfolio.Pages
             DeleteDialog deleteDialog = new("la ligne");
 
             ContentDialogResult result = await deleteDialog.ShowAsync();
-            
+
             if (result == ContentDialogResult.Primary)
             {
                 ViewModel.Delete(_portfolio, line, _search);
             }
         }
 
-        private async void CashAccountHistoryButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void CashAccountHistoryButton_Click(object _1, RoutedEventArgs _2)
         {
             CashAccountHistory historyDialog = new(_portfolio.ID);
 
             _ = await historyDialog.ShowAsync();
         }
 
-        private void MonetayAccountHistoryButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void MonetayAccountEditButton_Click(object _1, RoutedEventArgs _2)
         {
+            MonetaryAccount account = new(id: 0, name: "", portfolioID: _portfolio.ID);
+            MonetaryAccountEditDialog dialog = new(account);
 
+            ContentDialogResult result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                ViewModel.FetchMonetaryAccountBalances(_portfolio);
+            }
+        }
+
+        private async void RemoveMonetaryCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            if (args == null || args.Parameter == null)
+            {
+                return;
+            }
+
+            DeleteDialog deleteDialog = new("le fond");
+
+            ContentDialogResult result = await deleteDialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                ViewModel.DeleteMonetaryAccount(args.Parameter as MonetaryAccount, _portfolio);
+            }
+        }
+
+        private async void ModifyMonetaryCommand_ExecuteRequested(XamlUICommand _1, ExecuteRequestedEventArgs args)
+        {
+            if (args == null || args.Parameter == null)
+            {
+                return;
+            }
+
+            MonetaryAccountEditDialog dialog = new(args.Parameter as MonetaryAccount);
+
+            ContentDialogResult result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                ViewModel.FetchMonetaryAccountBalances(_portfolio);
+            }
         }
     }
 }

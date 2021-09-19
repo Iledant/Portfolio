@@ -61,5 +61,11 @@ namespace Portfolio.ViewModel
             PortfolioLineRepository.Delete(line);
             Fetch(portfolio, pattern);
         }
+
+        public void DeleteMonetaryAccount(MonetaryAccount account, PortFolio portfolio)
+        {
+            MonetaryAccountRepository.Delete(account);
+            FetchMonetaryAccountBalances(portfolio);
+        }
     }
 }

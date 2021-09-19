@@ -34,6 +34,21 @@
                 <SymbolIconSource Symbol="Edit"/>
             </XamlUICommand.IconSource>
         </XamlUICommand>
+        <XamlUICommand
+            x:Name="UIRemoveMonetaryCommand"
+            ExecuteRequested="RemoveMonetaryCommand_ExecuteRequested"
+            Description="Supprimer le fond"
+            Label="Supprimer">
+            <XamlUICommand.IconSource>
+                <SymbolIconSource Symbol="Delete"/>
+            </XamlUICommand.IconSource>
+        </XamlUICommand>
+        <XamlUICommand
+            x:Name="UIModifyMonetaryCommand"
+            ExecuteRequested="ModifyMonetaryCommand_ExecuteRequested"
+            Description="Modifier le nom du fond"
+            Label="Modifier">
+        </XamlUICommand>
     </Page.Resources>
 
     <Grid RowSpacing="12" ColumnSpacing="6" Padding="12">
@@ -60,28 +75,41 @@
         </Button>
         <Rectangle Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Fill="Yellow" Width="6" />
         <TextBlock Grid.Column="1" Grid.Row="2" Text="Fonds monétaires" Style="{ThemeResource SubtitleTextBlockStyle}" />
-        <Button Grid.Column="2" Grid.Row="2" x:Name="MonetaryAccountHistoryButton" Click="MonetayAccountHistoryButton_Click" HorizontalAlignment="Right" Padding="0" ToolTipService.ToolTip="Ajouter">
+        <Button Grid.Column="2" Grid.Row="2" x:Name="MonetaryAccountHistoryButton" Click="MonetayAccountEditButton_Click" HorizontalAlignment="Right" Padding="0" ToolTipService.ToolTip="Ajouter">
             <SymbolIcon Symbol="Add"/>
         </Button>
-        <GridView Grid.Row="3" Grid.ColumnSpan="3" Grid.Column="1" x:Name="MonetaryList" ItemsSource="{x:Bind ViewModel.MonetaryAccountBalances}">
+        <GridView Grid.Row="3" Grid.ColumnSpan="3" Grid.Column="1" x:Name="MonetaryList" ItemsSource="{x:Bind ViewModel.MonetaryAccountBalances, Mode=OneWay}">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local3:MonetaryAccountBalance">
-                    <Grid ColumnSpacing="6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Rectangle Fill="Yellow" Width="3" Grid.Column="0"/>
-                        <TextBlock Text="Nom du fond" Grid.Column="1" Grid.Row="0" />
-                        <TextBlock Text="Montant" Grid.Column="1" Grid.Row="1" />
-                        <TextBlock Text="{x:Bind Name}" Grid.Column="2" Grid.Row="0" />
-                        <TextBlock Text="{x:Bind sys:String.Format('{0:c}', Balance)}" Grid.Column="2" Grid.Row="1" />
-                    </Grid>
+                    <UserControl>
+                        <Grid ColumnSpacing="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Rectangle Fill="Yellow" Width="3" Grid.Column="0" Grid.RowSpan="2"/>
+                            <TextBlock Text="Nom du fond" Grid.Column="1" Grid.Row="0" />
+                            <TextBlock Text="Solde" Grid.Column="1" Grid.Row="1" />
+                            <TextBlock Text="{x:Bind Name}" Grid.Column="2" Grid.Row="0" />
+                            <TextBlock Text="{x:Bind sys:String.Format('{0:c}', Balance)}" Grid.Column="2" Grid.Row="1" TextAlignment="Right" />
+                        </Grid>
+
+                        <UserControl.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem 
+                                Command="{StaticResource UIRemoveMonetaryCommand}" 
+                                CommandParameter="{x:Bind }"/>
+                                <MenuFlyoutItem 
+                                Command="{StaticResource UIModifyMonetaryCommand}" 
+                                CommandParameter="{x:Bind }"/>
+                            </MenuFlyout>
+                        </UserControl.ContextFlyout>
+                    </UserControl>
                 </DataTemplate>
             </GridView.ItemTemplate>    
         </GridView>
