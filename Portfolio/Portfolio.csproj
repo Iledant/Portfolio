@@ -142,6 +142,9 @@
     <Compile Include="Dialogs\FundEditDialog.xaml.cs">
       <DependentUpon>FundEditDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\MonetaryAccountEditDialog.xaml.cs">
+      <DependentUpon>MonetaryAccountEditDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\PortfolioEditDialog.xaml.cs">
       <DependentUpon>PortfolioEditDialog.xaml</DependentUpon>
     </Compile>
@@ -262,6 +265,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\FundEditDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\MonetaryAccountEditDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

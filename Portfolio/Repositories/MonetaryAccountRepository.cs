@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using Npgsql;
+using Portfolio.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,40 @@ namespace Portfolio.Repositories
                 lines.Add(new(id: reader.GetInt32(0), name: reader.GetString(1), balance: reader.GetDouble(2)));
             }
             return lines;
+        }
+
+        public static void Insert(MonetaryAccount account)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            string insertQry = "INSERT INTO monetary_account (name,portfolio_id) VALUES(@name,@portfolio_id)";
+            using NpgsqlCommand? cmd = new(insertQry, con);
+            _ = cmd.Parameters.AddWithValue("name", account.Name);
+            _ = cmd.Parameters.AddWithValue("portfolio_id", account.PortfolioID);
+            try
+            {
+                _ = cmd.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+                DB.State = DBState.Error;
+            }
+        }
+
+        public static void Update(MonetaryAccount account)
+        {
+            NpgsqlConnection? con = DB.GetConnection();
+            string insertQry = $"UPDATE monetary_account SET name=@name,portfolio_id=@portfolio_id WHERE id={account.ID}";
+            using NpgsqlCommand? cmd = new(insertQry, con);
+            _ = cmd.Parameters.AddWithValue("name", account.Name);
+            _ = cmd.Parameters.AddWithValue("portfolio_id", account.PortfolioID);
+            try
+            {
+                _ = cmd.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+                DB.State = DBState.Error;
+            }
         }
     }
 }
