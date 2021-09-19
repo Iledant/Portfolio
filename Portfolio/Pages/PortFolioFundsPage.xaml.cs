@@ -1,5 +1,6 @@
 ﻿using Portfolio.Dialogs;
 using Portfolio.Models;
+using Portfolio.Repositories;
 using Portfolio.ViewModel;
 using System;
 using Windows.UI.Xaml;
@@ -136,7 +137,8 @@ namespace Portfolio.Pages
 
             if (result == ContentDialogResult.Primary)
             {
-                ViewModel.DeleteMonetaryAccount(args.Parameter as MonetaryAccount, _portfolio);
+                MonetaryAccountBalance accountBalance = args.Parameter as MonetaryAccountBalance;
+                ViewModel.DeleteMonetaryAccount(accountBalance.ToMonetaryAccount(_portfolio), _portfolio);
             }
         }
 
@@ -147,7 +149,8 @@ namespace Portfolio.Pages
                 return;
             }
 
-            MonetaryAccountEditDialog dialog = new(args.Parameter as MonetaryAccount);
+            MonetaryAccountBalance accountBalance = args.Parameter as MonetaryAccountBalance;
+            MonetaryAccountEditDialog dialog = new(accountBalance.ToMonetaryAccount(_portfolio));
 
             ContentDialogResult result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)

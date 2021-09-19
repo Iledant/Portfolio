@@ -22,6 +22,11 @@ namespace Portfolio.Repositories
             Name = name;
             Balance = balance;
         }
+
+        public MonetaryAccount ToMonetaryAccount(PortFolio portFolio)
+        {
+            return new(id: ID, name: Name, portfolioID: portFolio.ID, portfolioName: portFolio.Name);
+        }
     }
 
     public static class MonetaryAccountRepository
